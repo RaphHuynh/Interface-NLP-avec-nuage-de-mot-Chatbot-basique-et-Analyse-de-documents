@@ -1,25 +1,35 @@
 import math
 
-def distance_cosinus(list_mot_phrase_1, list_mot_phrase_2):
+def similarite_cosinus(vecteur_1, vecteur_2):
     # Calcul du produit scalaire
-    produit_scalaire = sum(a * b for a, b in zip(list_mot_phrase_1, list_mot_phrase_2))
+    produit_scalaire = sum(a * b for a, b in zip(vecteur_1, vecteur_2))
 
     # Calcul des normes
-    norme_phrase_1 = math.sqrt(sum(a ** 2 for a in list_mot_phrase_1))
-    norme_phrase_2 = math.sqrt(sum(b ** 2 for b in list_mot_phrase_2))
+    norme_vecteur_1 = math.sqrt(sum(a ** 2 for a in vecteur_1))
+    norme_vecteur_2 = math.sqrt(sum(b ** 2 for b in vecteur_2))
 
-    # Calcul et retour de la distance cosinus
-    if norme_phrase_1 == 0 or norme_phrase_2 == 0:
-        return 0  # Évite la division par zéro
-    else:
-        return produit_scalaire / (norme_phrase_1 * norme_phrase_2)
+    # Vérifier si les normes sont différentes de zéro pour éviter la division par zéro
+    if norme_vecteur_1 == 0 or norme_vecteur_2 == 0:
+        return 0
 
+    # Calcul de la similarité cosinus
+    similarite = produit_scalaire / (norme_vecteur_1 * norme_vecteur_2)
 
-def matrix_distance_Cosinus(corpus):
-    matrix = [[0 for _ in corpus] for _ in corpus]
+    return similarite
 
-    for i in range(len(corpus)):
-        for j in range(len(corpus)):
-            matrix[i][j] = distance_cosinus(corpus[i], corpus[j])
+def distance_cosinus(vecteur_1, vecteur_2):
+    # Calcul de la similarité cosinus
+    similarite = similarite_cosinus(vecteur_1, vecteur_2)
 
-    return matrix
+    # Calcul de la distance cosinus
+    return 1 - similarite
+
+def matrice_distance_cosinus(corpus):
+    taille = len(corpus)
+    matrice = [[0 for _ in range(taille)] for _ in range(taille)]
+
+    for i in range(taille):
+        for j in range(taille):
+            matrice[i][j] = distance_cosinus(corpus[i], corpus[j])
+
+    return matrice
