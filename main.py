@@ -89,7 +89,7 @@ def server(input, output, session):
         if distance == "Euclidienne":
             distance_matrix = matrix_distance_Euclidienne(list_backbofwords)
         elif distance == "Cosinus":
-            distance_matrix = matrix_distance_Cosinus(list_backbofwords)
+            distance_matrix = matrix_distance_cosinus(list_backbofwords)
         else:
             distance_matrix = matrix_distance_Manhattan(list_backbofwords)
 
@@ -99,7 +99,7 @@ def server(input, output, session):
         if distance == "Euclidienne":
             distance_normalise = matrix_distance_Euclidienne(normalized_matrix)
         elif distance == "Cosinus":
-            distance_normalise = matrix_distance_Cosinus(normalized_matrix)
+            distance_normalise = matrix_distance_cosinus(normalized_matrix)
         else:
             distance_normalise = matrix_distance_Manhattan(normalized_matrix)
 
