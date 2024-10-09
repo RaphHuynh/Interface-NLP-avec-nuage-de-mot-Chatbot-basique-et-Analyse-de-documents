@@ -56,3 +56,22 @@ def separer_phrase(contenu):
     for phrase in phrases_temp:
         phrases_finales.extend(phrase.split('?'))
     return [phrase.strip() for phrase in phrases_finales if phrase.strip()]
+
+
+def stopwords(corpus, nom_stop_words):
+    if nom_stop_words == "en_short":
+        with open("stopwords/en_short.txt", "r") as fichier:
+            mots_vides = fichier.read().split("\n")
+    elif nom_stop_words == "en":
+        with open("stopwords/en.txt", "r") as fichier:
+            mots_vides = fichier.read().split("\n")
+    else:
+        with open("stopwords/fr.txt", "r") as fichier:
+            mots_vides = fichier.read().split("\n")
+
+    mots_vides = [mot.lower() for mot in mots_vides]
+
+    corpus_lower = [doc.lower() for doc in corpus]
+    corpus_sans_stopwords = [" ".join([mot for mot in doc.split() if mot not in mots_vides]) for doc in corpus_lower]
+
+    return corpus_sans_stopwords
