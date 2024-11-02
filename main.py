@@ -7,6 +7,8 @@ app_ui = ui.page_fluid(
         ui.tags.link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"),
         ui.tags.link(rel="stylesheet", href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"),
         ui.tags.style("""
+            html { margin: 0; padding: 0; }
+            main { margin: 0; padding: 0; }
             body { margin: 0; padding: 0; }
             .sidebar { height: 100vh; overflow-y: auto; }
             .main-content { height: 100vh; overflow-y: auto; }
@@ -22,6 +24,12 @@ app_ui = ui.page_fluid(
                 background-color: #f2f2f2;
                 text-align: left;
             }
+            .container {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
         """)
     ),
     ui.div(
@@ -30,11 +38,9 @@ app_ui = ui.page_fluid(
             ui.h2("Menu", class_="text-2xl font-bold mb-4 border-b border-gray-300 pb-3"),
             ui.input_select("lang_select", "", choices={"Français": "Français", "English": "English"}, selected="Français"),
             ui.p("Descripteur", class_="mt-4"),
-            ui.input_select("choix1", "", choices={"1": "Binaire", "2": "Occurrence"}, selected="1"),
+            ui.input_select("choix1", "", choices={"1": "Binaire", "2": "Occurrence", "3": "Normalisé", "4":"Probabilité","5":"TF-IDF Binaire","6":"TF-IDF Normalisé", "7":"TF-IDF Occurence","8":"TF-IDF new"}, selected="1"),
             ui.p("Distance", class_="mt-4"),
-            ui.input_select("choix2", "", choices={"Euclidienne": "Euclidienne", "Manhattan": "Manhattan", "Cosinus": "Cosinus"}, selected="Euclidienne"),
-            ui.p("Normalisation", class_="mt-4"),
-            ui.input_select("choix3", "", choices={"Probabiliste": "Probabiliste", "Norme": "Norme"}, selected="Probabiliste"),
+            ui.input_select("choix2", "", choices={"Euclidienne": "Euclidienne", "Manhattan": "Manhattan", "Cosinus": "Cosinus","Hamming":"Hamming","Curtis":"Curtis","Jacard":"Jacard","Kullback":"Kullback"}, selected="Euclidienne"),
             ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=False),
             ui.input_action_button("generate", "Generate", class_="mt-4 w-full bg-black text-white py-2 px-4 rounded"),
             class_="w-1/5 bg-gray-50 p-4 sidebar"
@@ -82,7 +88,22 @@ def server(input, output, session):
 
         descripteur = "binaire" if input.choix1() == "1" else "occurrence"
         list_mot = split_doc_mot(phrases)
-        list_backbofwords = backbofwordsBinaire(corpus_sans_poc, liste_mots) if descripteur == "binaire" else backbofwords_occurence(corpus_sans_poc, liste_mots)
+        if input.choix1() == "1":
+            list_backbofwords = backbofwordsBinaire(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "2":
+            list_backbofwords = backbofwords_occurence(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "3":
+            list_backbofwords = matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "4":
+            list_backbofwords = matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "5":
+            list_backbofwords = tf_idf_bin(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "6":
+            list_backbofwords = tf_idf_norm(corpus_sans_poc, liste_mots)
+        elif input.choix1() == "7":
+            list_backbofwords = tf_idf_occ(corpus_sans_poc, liste_mots)
+        else:
+            list_backbofwords = tf_idf_new(corpus_sans_poc, liste_mots)
 
         distance = input.choix2()
 
@@ -90,30 +111,24 @@ def server(input, output, session):
             distance_matrix = matrix_distance_Euclidienne(list_backbofwords)
         elif distance == "Cosinus":
             distance_matrix = matrice_distance_cosinus(list_backbofwords)
+        elif distance == "Hamming":
+            distance_matrix = matrice_distance_hamming(list_backbofwords)
+        elif distance == "Jacard":
+            distance_matrix = matrice_distance_jacard(list_backbofwords)
+        elif distance == "Curtis":
+            distance_matrix = matrice_distance_bray_curtis(list_backbofwords)
+        elif distance == "Kullback":
+            distance_matrix = matrice_kullback_leibler(list_backbofwords)
         else:
             distance_matrix = matrix_distance_Manhattan(list_backbofwords)
-
-        normalisation = input.choix3()
-        normalized_matrix = matrix_backbofwords_normalize_proba(list_backbofwords) if normalisation == "Probabiliste" else matrix_backbofwords_normalize_Norme(list_backbofwords)
-
-        if distance == "Euclidienne":
-            distance_normalise = matrix_distance_Euclidienne(normalized_matrix)
-        elif distance == "Cosinus":
-            distance_normalise = matrice_distance_cosinus(normalized_matrix)
-        else:
-            distance_normalise = matrix_distance_Manhattan(normalized_matrix)
 
         # Convertir les matrices en DataFrames pandas
         backofword = pd.DataFrame(list_backbofwords)
         distance_df = pd.DataFrame(distance_matrix)
-        normalized_df = pd.DataFrame(normalized_matrix)
-        distance_normalise_df = pd.DataFrame(distance_normalise)
 
         # Styliser les DataFrames
         backofword_styled = style_dataframe(backofword).to_html()
         distance_df_styled = style_dataframe(distance_df).to_html()
-        normalized_df_styled = style_dataframe(normalized_df).to_html()
-        distance_normalise_df_styled = style_dataframe(distance_normalise_df).to_html()
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4"),
@@ -121,7 +136,6 @@ def server(input, output, session):
                 ui.p(ui.strong("Fichier analysé : "), uploaded_file['name']),
                 ui.p(ui.strong("Descripteur : "), descripteur),
                 ui.p(ui.strong("Distance : "), distance),
-                ui.p(ui.strong("Normalisation : "), normalisation),
                 class_="mb-4"
             ),
             ui.div(
@@ -131,16 +145,6 @@ def server(input, output, session):
             ),
             ui.div(
                 ui.h4("Matrice de distance", class_="text-lg font-semibold mb-2"),
-                ui.HTML(distance_df_styled),
-                class_="mb-4 overflow-x-auto"
-            ),
-            ui.div(
-                ui.h4("Matrice normalisée", class_="text-lg font-semibold mb-2"),
-                ui.HTML(normalized_df_styled),
-                class_="mb-4 overflow-x-auto"
-            ),
-            ui.div(
-                ui.h4("Matrice distance normalisée", class_="text-lg font-semibold mb-2"),
                 ui.HTML(distance_df_styled),
                 class_="mb-4 overflow-x-auto"
             )

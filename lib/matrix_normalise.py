@@ -1,6 +1,8 @@
 import math
+from .backofword_occurence import backbofwords_occurence
 
-def matrix_backbofwords_normalize_proba(matrix):
+def matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots):
+    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
 
     for i in range(len(matrix)):
@@ -11,7 +13,8 @@ def matrix_backbofwords_normalize_proba(matrix):
     return matrix_normalize
 
 
-def matrix_backbofwords_normalize_Norme(matrix):
+def matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots):
+    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
 
     for i in range(len(matrix)):

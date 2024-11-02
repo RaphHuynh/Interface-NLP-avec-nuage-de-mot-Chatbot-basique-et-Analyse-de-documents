@@ -45,7 +45,3 @@ def tf_idf_norm(list_mot, corpus):
             matrix_tf_idf[i][j] = tf * idf
 
     return matrix_tf_idf
-
-
-matrix_tf_idf_norm = tf_idf_norm(corpus_mots_sans_doublons, corpus_sans_poc)
-affichage_matrix_distance(matrix_tf_idf_norm)

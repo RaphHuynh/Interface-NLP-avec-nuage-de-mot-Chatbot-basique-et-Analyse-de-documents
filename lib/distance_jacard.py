@@ -12,7 +12,7 @@ def distance_jacard(vecteur_1, vecteur_2):
     # Calcul de la distance de Jaccard
     return 1 - intersection / union
 
-def matrice_distance_jaccard(corpus):
+def matrice_distance_jacard(corpus):
     taille = len(corpus)
     matrice = [[0 for _ in range(taille)] for _ in range(taille)]
 
