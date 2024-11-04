@@ -14,3 +14,6 @@ from .tf_idf_norm import *
 from .tf_idf_new import *
 from .tf_idf_occ import *
 from .tf_idf_bin import *
+from .matrice_similarite import *
+from .k_plus_proches_documents import *
+from .utils import *

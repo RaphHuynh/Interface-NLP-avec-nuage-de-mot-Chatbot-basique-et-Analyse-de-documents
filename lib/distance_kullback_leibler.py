@@ -1,3 +1,6 @@
+import math
+
+
 def distance_kullback_leibler(vecteur_1, vecteur_2):
     """
     Calculate the Kullback-Leibler distance between two vectors.
