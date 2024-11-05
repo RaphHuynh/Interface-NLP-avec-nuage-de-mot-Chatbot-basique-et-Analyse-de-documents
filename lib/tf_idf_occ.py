@@ -16,17 +16,14 @@ def tf_idf_occ(list_mot, corpus):
     # Calculer le nombre de documents
     nombre_documents = len(corpus)
 
-    corpus_lower = [doc.lower() for doc in corpus]
-
     # Calculer le nombre de documents contenant chaque mot
-    nombre_documents_mot = [sum(1 for doc in corpus_lower if mot in doc.split()) for mot in list_mot]
+    nombre_documents_mot = [sum(1 for doc in corpus if mot in doc.split()) for mot in list_mot]
 
     # Calculer la matrice TF-IDF
     for i in range(len(corpus)):
         # Découper le document en mots
 
-        mots_document = corpus_lower[i].split()
-        longueur_document = len(mots_document)
+        mots_document = corpus[i].split()
 
         for j, mot in enumerate(list_mot):
             # Calculer le nombre d'occurrences du mot dans le document
@@ -40,9 +37,6 @@ def tf_idf_occ(list_mot, corpus):
                 idf = math.log10(nombre_documents / nombre_documents_mot[j])
             else:
                 idf = 0
-
-            if mot == "cats":
-                print(tf, idf, nombre_documents, nombre_documents_mot[j])
 
             # Calculer le terme TF-IDF``
             matrix_tf_idf[i][j] = tf * idf

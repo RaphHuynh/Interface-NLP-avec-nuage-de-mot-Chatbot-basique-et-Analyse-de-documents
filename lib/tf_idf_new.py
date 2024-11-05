@@ -1,21 +1,19 @@
 import math
 
-def tf_idf_new(list_mot, corpus):
+def tf_idf_new(corpus,list_mot):
     # Initialiser la matrice TF-IDF
     matrix_tf_idf = [[0 for _ in list_mot] for _ in corpus]
 
     # Calculer le nombre de documents
     nombre_documents = len(corpus)
 
-    corpus_lower = [doc.lower() for doc in corpus]
-
     # Calculer le nombre de documents contenant chaque mot
-    nombre_documents_mot = [sum(1 for doc in corpus_lower if mot in doc.split()) for mot in list_mot]
+    nombre_documents_mot = [sum(1 for doc in corpus if mot in doc.split()) for mot in list_mot]
 
     # Calculer la matrice TF-IDF
-    for i in range(len(corpus_lower)):
+    for i in range(len(corpus)):
         # Découper le document en mots
-        mots_document = corpus_lower[i].split()
+        mots_document = corpus[i].split()
         longueur_document = len(mots_document)
 
         for j, mot in enumerate(list_mot):
@@ -23,7 +21,11 @@ def tf_idf_new(list_mot, corpus):
             nombre_occurrences = mots_document.count(mot)
 
             # Calculer le terme TF
-            tf = math.log2(1 + nombre_occurrences) / math.log2(longueur_document)
+            log2longueur_document = math.log2(longueur_document)
+            if log2longueur_document == 0:
+                log2longueur_document = 1e-5
+            
+            tf = math.log2(1 + nombre_occurrences) / log2longueur_document
 
             # Calculer le terme IDF avec vérification pour éviter la division par zéro
             if nombre_documents_mot[j] > 0:

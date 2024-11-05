@@ -1,6 +1,6 @@
 import math
 
-def tf_idf_bin(list_mot, corpus):
+def tf_idf_bin(corpus,list_mot):
     """
     Calcule la matrice TF-IDF binaire pour un corpus donné.
 
@@ -17,15 +17,13 @@ def tf_idf_bin(list_mot, corpus):
     # Calculer le nombre de documents
     nombre_documents = len(corpus)
 
-    corpus_lower = [doc.lower() for doc in corpus]
-
     # Calculer le nombre de documents contenant chaque mot
-    nombre_documents_mot = [sum(1 for doc in corpus_lower if mot in doc.split()) for mot in list_mot]
+    nombre_documents_mot = [sum(1 for doc in corpus if mot in doc.split()) for mot in list_mot]
 
     # Calculer la matrice TF-IDF
-    for i in range(len(corpus_lower)):
+    for i in range(len(corpus)):
         # Découper le document en mots
-        mots_document = set(corpus_lower[i].split())  # Utiliser un ensemble pour une recherche rapide
+        mots_document = set(corpus[i].split())  # Utiliser un ensemble pour une recherche rapide
 
         for j, mot in enumerate(list_mot):
             # Calculer le terme TF binaire
