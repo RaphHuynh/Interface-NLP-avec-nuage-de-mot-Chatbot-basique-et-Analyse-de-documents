@@ -1,21 +1,7 @@
-from shiny import App, ui, render, reactive, session
+from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
-
-backofword_styled = None
-distance_df_styled = None
-
-def descriptor_select_distance(choix):
-    if choix == "1":
-        return ["Euclidienne", "Manhattan", "Cosinus", "Curtis", "Kullback", "Jacard", "Hamming"]
-    else:
-        return ["Euclidienne", "Manhattan", "Cosinus", "Curtis", "Kullback"]
-    
-def update_constant(new_value, new_value2):
-            global backofword_styled
-            backofword_styled = new_value
-            global distance_df_styled
-            distance_df_styled = new_value2
+from lib.utils import *
 
 app_ui = ui.page_fluid(
     ui.tags.head(
@@ -120,86 +106,19 @@ app_ui = ui.page_fluid(
         # Main content
         ui.div(
             ui.output_ui("content"),
-            # Modal pour la matrice backofword
-            ui.div(
-                {"class": "modal", "id": "backofwordModal"},
-                ui.div(
-                    {"class": "modal-content"},
-                    ui.span({"class": "close-modal"}, "×"),
-                    ui.h4("Matrice backofword", class_="text-lg font-semibold mb-2"),
-                    ui.HTML(backofword_styled),
-                    ui.output_ui("backofword_matrix"),
-                )
-            ),
-            # Modal pour la matrice de distance
-            ui.div(
-                {"class": "modal", "id": "distanceModal"},
-                ui.div(
-                    {"class": "modal-content"},
-                    ui.span({"class": "close-modal"}, "×"),
-                    ui.h4("Matrice de distance", class_="text-lg font-semibold mb-2"),
-                    ui.output_ui("distance_matrix"),
-                )
-            ),
             class_="w-4/5 p-8 main-content"
         ),
         class_="flex"
     ),
 )
 
-def style_dataframe(df):
-    return df.style.set_table_attributes('class="table-auto w-full border-collapse border border-gray-200"') \
-           .set_properties(**{'border': '1px solid black'}) \
-           .background_gradient(cmap='viridis', low=0, high=1)
-
-def get_backbofwords(corpus_sans_poc, liste_mots, choix1):
-    if choix1 == "1":
-        return backbofwordsBinaire(corpus_sans_poc, liste_mots)
-    elif choix1 == "2":
-        return backbofwords_occurence(corpus_sans_poc, liste_mots)
-    elif choix1 == "3":
-        return matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots)
-    elif choix1 == "4":
-        return matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots)
-    elif choix1 == "5":
-        return tf_idf_bin(corpus_sans_poc, liste_mots)
-    elif choix1 == "6":
-        return tf_idf_norm(corpus_sans_poc, liste_mots)
-    elif choix1 == "7":
-        return tf_idf_occ(corpus_sans_poc, liste_mots)
-    else:
-        return tf_idf_new(corpus_sans_poc, liste_mots)
-
-def get_distance_matrix(list_backbofwords, distance):
-    if distance == "Euclidienne":
-        return matrix_distance_Euclidienne(list_backbofwords)
-    elif distance == "Cosinus":
-        return matrice_distance_cosinus(list_backbofwords)
-    elif distance == "Curtis":
-        return matrice_distance_bray_curtis(list_backbofwords)
-    elif distance == "Kullback":
-        return matrice_kullback_leibler(list_backbofwords)
-    elif distance == "Jacard":
-        return matrice_distance_jacard(list_backbofwords)
-    elif distance == "Hamming":
-        return matrice_distance_hamming(list_backbofwords)
-    else:
-        return matrix_distance_Manhattan(list_backbofwords)
-
-def get_k_nearest_phrases(corpus_sans_poc, selected_phrase_index, k, distance_matrix):
-    if selected_phrase_index is not None:
-        selected_phrase = corpus_sans_poc[selected_phrase_index]
-        k_nearest = K_plus_proches_documents(selected_phrase, k, corpus_sans_poc, distance_matrix)
-        return [f"• {phrase}: {distance}" for phrase, distance in k_nearest]
-    else:
-        return []
-
 def server(input, output, session):
     lang = reactive.Value("Français")
     phrases = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
-    matrices = reactive.Value({"backofword": None, "distance": None})
+    backofword_df = reactive.Value(None)
+    distance_df = reactive.Value(None)
 
     @reactive.Effect
     @reactive.event(input.lang_select)
@@ -240,26 +159,8 @@ def server(input, output, session):
         else:
             ui.update_slider("k_value", max=10)
 
-    @output
-    @render.ui
-    def backofword_matrix():
-        if matrices.get()["backofword"] is not None:
-            return ui.div(
-                ui.HTML(matrices.get()["backofword"]),
-                class_="overflow-auto"
-            )
-        return ui.p("Aucune matrice disponible")
 
-    @output
-    @render.ui
-    def distance_matrix():
-        if matrices.get()["distance"] is not None:
-            return ui.div(
-                ui.HTML(matrices.get()["distance"]),
-                class_="overflow-auto"
-            )
-        return ui.p("Aucune matrice disponible")
-
+        
     @output
     @render.ui
     def content():
@@ -292,11 +193,9 @@ def server(input, output, session):
         k = input.k_value()
         k_nearest_phrases = get_k_nearest_phrases(corpus_sans_poc, selected_phrase_index.get(), k, distance_matrix)
 
-        # Convert matrices to DataFrames
-        backofword = pd.DataFrame(list_backbofwords)
+        # Affiche les matrices de manière permanente
+        backofword_df = pd.DataFrame(list_backbofwords)
         distance_df = pd.DataFrame(distance_matrix)
-        
-        update_constant(backofword, distance_df)
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),
@@ -311,24 +210,27 @@ def server(input, output, session):
                 class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
             ),
             ui.div(
-                ui.input_action_button(id="showBackofword", label="Voir matrice backofword", class_="bg-blue-500 text-white px-4 py-2 rounded mr-2 shadow-md"),
-                ui.input_action_button(id="showDistance", label="Voir matrice distance", class_="bg-green-500 text-white px-4 py-2 rounded shadow-md"),
-                class_="mb-4"
-            )
+                ui.div(
+                    ui.h4("Matrice Backofword", class_="text-lg font-semibold mb-2 text-center"),
+                    ui.div(
+                        ui.HTML(style_dataframe(backofword_df).to_html()),
+                        class_="overflow-x-auto max-h-96 mb-2"
+                    ),
+                    class_="w-1/2 bg-gray-50 p-4 rounded-lg border-2 shadow-md"
+                ),
+                ui.div(
+                    ui.h4("Matrice de Distance", class_="text-lg font-semibold mb-2 text-center"),
+                    ui.div(
+                        ui.HTML(style_dataframe(distance_df).to_html()),
+                        class_="overflow-x-auto max-h-96 mb-2"
+                    ),
+                    class_="w-1/2 bg-gray-50 p-4 rounded-lg border-2 shadow-md"
+                ),
+                class_="flex gap-2"
+            ),
         )
-        
-def style_dataframe(df):
-    return df.style\
-        .set_table_attributes('class="table-auto w-full border-collapse border border-gray-200"')\
-        .format("{:.3f}")\
-        .background_gradient(cmap='viridis', low=0, high=1)\
-        .set_properties(**{
-            'white-space': 'nowrap',
-            'font-size': '14px',
-            'text-align': 'center'
-        })
 
-app = App(app_ui, server)
+app = App(app_ui, server)  
 
 if __name__ == "__main__":
     app.run()
