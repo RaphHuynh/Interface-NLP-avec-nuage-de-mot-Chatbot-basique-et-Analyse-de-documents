@@ -1,6 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
+from lib import matrice_similarite
 from lib.utils import *
 
 app_ui = ui.page_fluid(
@@ -112,6 +113,7 @@ app_ui = ui.page_fluid(
     ),
 )
 
+# Mise à jour de la fonction de rendu pour inclure le graphe
 def server(input, output, session):
     lang = reactive.Value("Français")
     phrases = reactive.Value([])
@@ -119,6 +121,7 @@ def server(input, output, session):
     selected_phrase_index_str = reactive.Value("0")
     backofword_df = reactive.Value(None)
     distance_df = reactive.Value(None)
+    graph_image = reactive.Value("")  # Variable pour l'image du graphe
 
     @reactive.Effect
     @reactive.event(input.lang_select)
@@ -140,12 +143,6 @@ def server(input, output, session):
         return ui.input_select("phrase_select", "Choisissez une phrase", choices={str(i): p for i, p in enumerate(phrases.get())}, selected=selected_phrase_index_str.get())
 
     @reactive.Effect
-    @reactive.event(input.choix1)
-    def update_distance_choices():
-        new_choices = descriptor_select_distance(input.choix1())
-        ui.update_select("choix2", choices=new_choices)
-
-    @reactive.Effect
     @reactive.event(input.file_input)
     def update_k_value_max():
         if input.file_input():
@@ -158,8 +155,12 @@ def server(input, output, session):
             ui.update_slider("k_value", max=len(corpus_sans_poc)-1)
         else:
             ui.update_slider("k_value", max=10)
-
-
+            
+    @reactive.Effect
+    @reactive.event(input.choix1)
+    def update_distance_choices():
+        new_choices = descriptor_select_distance(input.choix1())
+        ui.update_select("choix2", choices=new_choices)
         
     @output
     @render.ui
@@ -192,6 +193,10 @@ def server(input, output, session):
 
         k = input.k_value()
         k_nearest_phrases = get_k_nearest_phrases(corpus_sans_poc, selected_phrase_index.get(), k, distance_matrix)
+        k_max = len(corpus_sans_poc_stopword) - 1
+
+        # Générer le graphe des k plus proches voisins
+        graph_image.set(plot_knn_graph(k_max, distance_matrix, corpus_sans_poc, selected_phrase_index.get()))
 
         # Affiche les matrices de manière permanente
         backofword_df = pd.DataFrame(list_backbofwords)
@@ -226,7 +231,13 @@ def server(input, output, session):
                     ),
                     class_="w-1/2 bg-gray-50 p-4 rounded-lg border-2 shadow-md"
                 ),
-                class_="flex gap-2"
+                class_="flex gap-2 mb-4"
+            ),
+            # Afficher le graphique dans l'application
+            ui.div(
+                ui.h4("Graphique des K plus proches voisins", class_="text-lg font-semibold mb-2 text-center"),
+                ui.img(src=graph_image.get(), class_="w-full max-w-3xl mx-auto"),
+                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
             ),
         )
 
