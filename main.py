@@ -25,37 +25,7 @@ app_ui = ui.page_fluid(
                 background-color: #f2f2f2;
                 text-align: left;
             }
-            .container {
-                margin-left: 0 !important;
-                margin-right: 0 !important;
-                padding-left: 0 !important;
-                padding-right: 0 !important;
-            }
-            .modal {
-                display: none;
-                position: fixed;
-                z-index: 1000;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.4);
-            }
-            .modal-content {
-                background-color: white;
-                margin: 5% auto;
-                padding: 20px;
-                border-radius: 8px;
-                width: 90%;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-            .close-modal {
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-                cursor: pointer;
-            }
+            
         """),
         ui.tags.script("""
             $(document).on('click', '#showBackofword', function() {
@@ -119,8 +89,6 @@ def server(input, output, session):
     phrases = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
-    backofword_df = reactive.Value(None)
-    distance_df = reactive.Value(None)
     graph_image = reactive.Value("")  # Variable pour l'image du graphe
 
     @reactive.Effect
@@ -201,6 +169,14 @@ def server(input, output, session):
         # Affiche les matrices de manière permanente
         backofword_df = pd.DataFrame(list_backbofwords)
         distance_df = pd.DataFrame(distance_matrix)
+        
+        word_frequency = calculate_word_frequency(corpus_sans_poc_stopword)
+        word_frequency_df = pd.DataFrame(word_frequency.items(), columns=['Mot', 'Fréquence'])
+    
+        # Générer le graphe des fréquences des mots
+        word_freq_graph = plot_word_frequency(word_frequency_df)
+        
+        word_freq_graph_pie_chart = plot_word_frequency_pie(word_frequency_df)
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),
@@ -238,6 +214,19 @@ def server(input, output, session):
                 ui.h4("Graphique des K plus proches voisins", class_="text-lg font-semibold mb-2 text-center"),
                 ui.img(src=graph_image.get(), class_="w-full max-w-3xl mx-auto"),
                 class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+            ),
+            ui.div(
+                ui.div(
+                    ui.h4("Graphique des Fréquences des Mots", class_="text-lg font-semibold mb-2 text-center"),
+                    ui.img(src=word_freq_graph, class_="w-full max-w-3xl mx-auto"),
+                    class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                ),
+                ui.div(
+                    ui.h4("Répartition des Mots les plus Fréquents", class_="text-lg font-semibold mb-2 text-center"),
+                    ui.img(src=word_freq_graph_pie_chart, class_="w-full max-w-3xl mx-auto"),
+                    class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                ),
+                class_="flex gap-2 mb-4" 
             ),
         )
 
