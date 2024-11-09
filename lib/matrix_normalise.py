@@ -17,10 +17,11 @@ def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: 
 
     for i in range(len(matrix)):
         somme = sum(matrix[i])
-        if somme == 0:
-            somme = 1e-10
         for j in range(len(matrix[i])):
-            matrix_normalize[i][j] = matrix[i][j] / somme
+            if somme == 0:
+                matrix_normalize[i][j] = 0
+            else:
+                matrix_normalize[i][j] = matrix[i][j] / somme
 
     return matrix_normalize
 
@@ -37,12 +38,15 @@ def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: 
     """
     matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
+    
+    print("normalise")
 
     for i in range(len(matrix)):
         somme = math.sqrt(sum([x ** 2 for x in matrix[i]]))
-        if somme == 0:
-            somme = 0e-10
         for j in range(len(matrix[i])):
-            matrix_normalize[i][j] = matrix[i][j] / somme
+            if somme == 0:
+                matrix_normalize[i][j] = 0
+            else:
+                matrix_normalize[i][j] = matrix[i][j] / somme
 
     return matrix_normalize

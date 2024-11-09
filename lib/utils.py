@@ -126,9 +126,9 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
     elif choix1 == "2":
         return backbofwords_occurence(corpus_sans_poc, liste_mots)
     elif choix1 == "3":
-        return matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots)
-    elif choix1 == "4":
         return matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots)
+    elif choix1 == "4":
+        return matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots)
     elif choix1 == "5":
         return tf_idf_bin(corpus_sans_poc, liste_mots)
     elif choix1 == "6":

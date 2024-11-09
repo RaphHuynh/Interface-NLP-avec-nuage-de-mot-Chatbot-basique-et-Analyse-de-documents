@@ -1,7 +1,7 @@
 import math
 from typing import List
 
-def distance_kullback_leibler(vecteur_1: str, vecteur_2:str) -> float:
+def distance_kullback_leibler(vecteur_1: List[float], vecteur_2: List[float]) -> float:
     """
     Calculate the Kullback-Leibler distance between two vectors.
 
