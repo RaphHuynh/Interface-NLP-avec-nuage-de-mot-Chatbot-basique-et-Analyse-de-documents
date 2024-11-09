@@ -17,7 +17,7 @@ def tf_idf_norm(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
 
     # Calculer le nombre de documents
     nombre_documents = len(corpus)
-
+    
     # Calculer le nombre de documents contenant chaque mot
     nombre_documents_mot = [sum(1 for doc in corpus if mot in doc.split()) for mot in list_mot]
 
@@ -32,13 +32,13 @@ def tf_idf_norm(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
             nombre_occurrences = mots_document.count(mot)
 
             # Calculer le terme TF
-            tf = nombre_occurrences / longueur_document if longueur_document > 0 else 0
+            tf = nombre_occurrences / longueur_document if longueur_document > 0.0 else 1e-5
 
             # Calculer le terme IDF avec vérification pour éviter la division par zéro
             if nombre_documents_mot[j] > 0:
                 idf = math.log10(nombre_documents / nombre_documents_mot[j])
             else:
-                idf = 0
+                idf = 0.0
 
             # Calculer le terme TF-IDF
             matrix_tf_idf[i][j] = tf * idf

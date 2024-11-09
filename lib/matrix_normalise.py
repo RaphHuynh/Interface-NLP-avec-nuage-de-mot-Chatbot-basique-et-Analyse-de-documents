@@ -25,7 +25,7 @@ def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: 
     return matrix_normalize
 
 
-def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str:], liste_mots: List[str]) -> List[List[float]]:
+def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: List[str]) -> List[List[float]]:
     """ Calcule la matrice de backbofwords normalisée par norme
     
     Args:

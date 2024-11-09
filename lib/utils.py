@@ -9,6 +9,7 @@ from aquarel import load_theme
 import seaborn as sns
 from typing import List, Tuple, Dict
 import pandas as pd
+import math
 
 def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: List[str], selected_index: int) -> base64:
     """génère un graphique de réseau pour les k plus proches voisins d'un document sélectionné.
@@ -24,20 +25,27 @@ def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: 
     """
     G = nx.Graph()
     
-    # Ajouter les nœuds avec les indices comme labels
+    # Ajouter les nœuds avec les indices comme labels, mais ignorer les nœuds invalides (inf et NaN)
     for i in range(len(corpus_sans_poc)):
-        # Utilise l'index comme libellé du nœud
-        G.add_node(i, label=str(i))
+        # On vérifie que la distance n'est ni infinie ni NaN
+        if not any(math.isnan(dist) or dist == math.inf for dist in distance_matrix[i]):
+            G.add_node(i, label=str(i))
     
     # Ajouter les arêtes pour le nœud sélectionné et ses k plus proches voisins
     nearest_neighbors = sorted(enumerate(distance_matrix[selected_index]), key=lambda x: x[1])[:k+1]
     edges = []
-    max_dist = max([dist for _, dist in nearest_neighbors])
     
-    for neighbor, dist in nearest_neighbors[1:]:  # Exclure le nœud lui-même
-        # Ajouter une arête avec un poids inversé pour la distance (plus proche = plus lourd)
-        G.add_edge(selected_index, neighbor, weight=(max_dist+1)-dist)
-        edges.append((selected_index, neighbor, dist))
+    # Filtrer les voisins valides (exclure inf et NaN)
+    valid_neighbors = [(neighbor, dist) for neighbor, dist in nearest_neighbors if dist != math.inf and not math.isnan(dist)]
+    
+    if valid_neighbors:
+        # Calculer la distance maximale uniquement pour les voisins valides
+        max_dist = max([dist for _, dist in valid_neighbors])
+    
+        for neighbor, dist in valid_neighbors[1:]:  # Exclure le nœud lui-même
+            # Ajouter une arête avec un poids inversé pour la distance (plus proche = plus lourd)
+            G.add_edge(selected_index, neighbor, weight=(max_dist+1)-dist)
+            edges.append((selected_index, neighbor, dist))
     
     # Utiliser une disposition fixe en ancrant le nœud sélectionné au centre
     fixed_pos = {selected_index: (0, 0)}
@@ -49,7 +57,7 @@ def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: 
     plt.axis('off')  # Retire le cadre noir et les axes
 
     # Définir les couleurs des nœuds (rouge pour le nœud sélectionné, bleu pour les autres)
-    node_colors = ['red' if i == selected_index else 'skyblue' for i in range(len(corpus_sans_poc))]
+    node_colors = ['red' if i == selected_index else 'skyblue' for i in G.nodes()]
     
     node_sizes = 1000
     
@@ -60,16 +68,17 @@ def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: 
     # Tracer les nœuds et les arêtes du nœud sélectionné
     nx.draw_networkx_nodes(G, pos, node_color=node_colors, node_size=node_sizes)
     nx.draw_networkx_edges(G, pos, edgelist=[(selected_index, neighbor) for _, neighbor, _ in edges], edge_color=edge_colors, width=2)
-    nx.draw_networkx_labels(G, pos, labels={i: i for i in range(len(corpus_sans_poc))}, font_size=10, font_weight="bold")
+    nx.draw_networkx_labels(G, pos, labels={i: i for i in G.nodes()}, font_size=10, font_weight="bold")
 
     # Conversion en image PNG pour l'application
     buf = BytesIO()
-    plt.savefig(buf, format='png', bbox_inches='tight')  # 'bbox_inches' pour éviter les marges inutiles
+    plt.savefig(buf, format='png', bbox_inches='tight', transparent=True)  # 'bbox_inches' pour éviter les marges inutiles
     buf.seek(0)
     img_data = base64.b64encode(buf.read()).decode('utf-8')
     plt.close()
     
     return f"data:image/png;base64,{img_data}"
+
 
 def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: List[str]) -> Tuple[List[str], List[str]]:
     """Fonction pour supprimer les mots vides d'un corpus et d'une liste de mots.
@@ -123,9 +132,9 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
     elif choix1 == "5":
         return tf_idf_bin(corpus_sans_poc, liste_mots)
     elif choix1 == "6":
-        return tf_idf_norm(corpus_sans_poc, liste_mots)
-    elif choix1 == "7":
         return tf_idf_occ(corpus_sans_poc, liste_mots)
+    elif choix1 == "7":
+        return tf_idf_norm(corpus_sans_poc, liste_mots)
     else:
         return tf_idf_new(corpus_sans_poc, liste_mots)
 
@@ -173,7 +182,7 @@ def get_k_nearest_phrases(corpus_sans_poc: List[str], selected_phrase_index: int
     else:
         return []
     
-def style_dataframe(df: pd.DataFrame) -> pd.io.formats.style.Styler:
+def style_dataframe(df: pd.DataFrame):
     """ Fonction pour styliser un DataFrame avec des couleurs et des propriétés CSS.
 
     Args:
@@ -248,7 +257,7 @@ def plot_word_frequency(word_frequency_df: Dict[str, int]) -> base64:
         
         # Sauvegarde l'image dans un buffer
         buf = BytesIO()
-        plt.savefig(buf, format="png")
+        plt.savefig(buf, format="png", transparent=True)
         buf.seek(0)
         image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
         plt.close()
@@ -284,7 +293,7 @@ def plot_word_frequency_pie(word_frequency_df: Dict[str, int]) -> base64:
         
         # Sauvegarde l'image dans un buffer
         buf = BytesIO()
-        plt.savefig(buf, format="png")
+        plt.savefig(buf, format="png", transparent=True)
         buf.seek(0)
         image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
         plt.close()

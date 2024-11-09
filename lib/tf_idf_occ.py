@@ -1,7 +1,7 @@
 import math
 from typing import List
 
-def tf_idf_occ(list_mot: List[str: str], corpus: List[str]) -> List[List[float]]:
+def tf_idf_occ(corpus: List[str], list_mot: List[str]) -> List[List[float]]:
     """
     Calcule la matrice TF-IDF pour un corpus donné.
 

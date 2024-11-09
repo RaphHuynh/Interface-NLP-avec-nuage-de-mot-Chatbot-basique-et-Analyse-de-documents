@@ -1,4 +1,3 @@
-from .affichage import *
 from .backofword_binaire import *
 from .backofword_occurence import *
 from .distance_euclidienne import *

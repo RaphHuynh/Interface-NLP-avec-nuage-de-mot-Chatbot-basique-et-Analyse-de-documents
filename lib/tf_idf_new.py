@@ -31,11 +31,13 @@ def tf_idf_new(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
             nombre_occurrences = mots_document.count(mot)
 
             # Calculer le terme TF
-            log2longueur_document = math.log2(longueur_document)
-            if log2longueur_document == 0:
-                log2longueur_document = 1e-5
-            
-            tf = math.log2(1 + nombre_occurrences) / log2longueur_document
+            if longueur_document <= 0:
+                tf = math.inf
+            elif  math.log2(longueur_document) == 0:
+                tf = math.inf
+            else:
+                log2longueur_document = math.log2(longueur_document)
+                tf = math.log2(1 + nombre_occurrences) / log2longueur_document
 
             # Calculer le terme IDF avec vérification pour éviter la division par zéro
             if nombre_documents_mot[j] > 0:
