@@ -89,7 +89,7 @@ def server(input, output, session):
     phrases = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
-    graph_image = reactive.Value("")  # Variable pour l'image du graphe
+    graph_image = reactive.Value("")
 
     @reactive.Effect
     @reactive.event(input.lang_select)
@@ -216,8 +216,12 @@ def server(input, output, session):
             # Afficher le graphique dans l'application
             ui.div(
                 ui.h4("Graphique des K plus proches voisins", class_="text-lg font-semibold mb-2 text-center"),
-                ui.img(src=graph_image.get(), class_="w-full max-w-3xl mx-auto"),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                ui.div(
+                    ui.p("Le graphe des k plus proches voisins représente les distances entre les différentes phrases du corpus. Il permet de visualiser les relations entre les phrases en utilisant une mesure de distance spécifique choisi dans le menu. Cela signifie que plus les phrases sont proches du point central plus elles sont similaires à cette phrase. Chaque phrase est représentée par un point dans l'espace vectoriel. Le nombre représente l'index de la phrase dans le corpus."),
+                    ui.img(src=graph_image.get(), class_="w-full max-w-3xl mx-auto"),
+                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                ),
+                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md",
             ),
             ui.div(
                 ui.div(
