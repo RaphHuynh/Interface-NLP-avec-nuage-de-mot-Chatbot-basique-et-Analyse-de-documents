@@ -177,6 +177,10 @@ def server(input, output, session):
         word_freq_graph = plot_word_frequency(word_frequency_df)
         
         word_freq_graph_pie_chart = plot_word_frequency_pie(word_frequency_df)
+         
+        #Générer le boxplot des distances
+        distance_boxplot = plot_distance_boxplot(distance_matrix)
+
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),
@@ -226,7 +230,25 @@ def server(input, output, session):
                     ui.img(src=word_freq_graph_pie_chart, class_="w-full max-w-3xl mx-auto"),
                     class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
                 ),
-                class_="flex gap-2 mb-4" 
+                class_="flex gap-2" 
+            ),
+            ui.div(
+                ui.h4("Boxplot des Distances", class_="text-lg font-semibold mb-2 text-center"),
+                ui.div(
+                    ui.img(src=distance_boxplot, class_="w-full max-w-3xl mx-auto"),
+                    ui.p("Le boxplot des distances (entre phrases) représente la distribution des distances entre les différentes paires de phrases dans un espace vectoriel. Il permet de visualiser la similarité entre les phrases en utilisant une mesure de distance spécifique. Cela signifie que plus les phrases sont proches de 0 plus elles sont similaires."),
+                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                ),
+                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                ),
+            ui.div(
+                ui.h4("Boxplot des fréquences des mots par phrase", class_="text-lg font-semibold mb-2 text-center"),
+                ui.div(
+                    ui.p("Le boxplot des fréquences des mots par phrase représente la distribution des fréquences des mots dans chaque phrase. Il permet de visualiser la variabilité des fréquences des mots dans les phrases du corpus. On peut donc observer si les phrases sont plus ou moins homogènes, courtes ou longues."),
+                    ui.img(src=plot_number_of_words_boxplot(corpus_sans_poc), class_="w-full max-w-3xl mx-auto"),
+                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                ),
+                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
             ),
         )
 

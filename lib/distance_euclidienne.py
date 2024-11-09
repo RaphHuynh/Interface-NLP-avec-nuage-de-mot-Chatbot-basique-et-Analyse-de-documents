@@ -5,8 +5,8 @@ def distance_euclidienne(list_mot_phrase_1: str, list_mot_phrase2: str) -> float
     """ Calcule la distance euclidienne entre deux vecteurs de mots
     
     Args:
-        list_mot_phrase_1 (List[int]): vecteur de mots de la phrase 1
-        list_mot_phrase2 (List[int]): vecteur de mots de la phrase 2
+        list_mot_phrase_1 (str): vecteur de mots de la phrase 1
+        list_mot_phrase2 (str): vecteur de mots de la phrase 2
         
     Returns:
         float: la distance euclidienne entre les deux vecteurs

@@ -11,6 +11,17 @@ from typing import List, Tuple, Dict
 import pandas as pd
 import math
 
+def count_words_per_phrase(corpus: List[str]) -> List[int]:
+    """Compte le nombre de mots par phrase dans un corpus.
+    
+    Args:
+        corpus (List[str]): Le corpus de phrases.
+        
+    Returns:
+        List[int]: Le nombre de mots par phrase.
+    """
+    return [len(phrase.split()) for phrase in corpus]
+
 def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: List[str], selected_index: int) -> base64:
     """génère un graphique de réseau pour les k plus proches voisins d'un document sélectionné.
 
@@ -243,7 +254,7 @@ def plot_word_frequency(word_frequency_df: Dict[str, int]) -> base64:
     word_frequency_df = word_frequency_df.sort_values(by='Fréquence', ascending=False).head(20)
     
     # Création de la palette de couleurs personnalisée
-    color_palette = sns.color_palette("viridis", len(word_frequency_df))  # Utilisation de la palette "viridis"
+    color_palette = sns.color_palette("viridis", len(word_frequency_df))
     
     with load_theme("minimal_light"):
         # Création du graphique avec des barres horizontales
@@ -277,7 +288,7 @@ def plot_word_frequency_pie(word_frequency_df: Dict[str, int]) -> base64:
     word_frequency_df = word_frequency_df.sort_values(by='Fréquence', ascending=False).head(10)
     
     # Création de la palette de couleurs personnalisée
-    color_palette = sns.color_palette("viridis", len(word_frequency_df))  # Utilisation de la palette "viridis"
+    color_palette = sns.color_palette("viridis", len(word_frequency_df))
     
     # Création du graphique avec le thème "minimal_light"
     with load_theme("minimal_light"):
@@ -298,3 +309,79 @@ def plot_word_frequency_pie(word_frequency_df: Dict[str, int]) -> base64:
         image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
         plt.close()
         return f"data:image/png;base64,{image_base64}"
+
+# Fonction pour générer un boxplot des distances
+def plot_distance_boxplot(distance_matrix: List[List[float]]) -> base64:
+    """ Fonction pour générer un boxplot des distances entre les paires de phrases.
+    
+    Args:
+        distance_matrix (List[List[float]]): Matrice de distance entre les paires de phrases.
+        
+    Returns:
+        base64: Image encodée en base64.
+    """
+    # Création de la palette de couleurs personnalisée
+    color_palette = sns.color_palette("viridis", len(distance_matrix))
+    
+    # Création du boxplot avec matplotlib
+    plt.figure(figsize=(10, 6))
+    box = plt.boxplot(distance_matrix, patch_artist=True)  # Utilisation de patch_artist pour colorier les boîtes
+    
+    # Appliquer la couleur de fond à chaque boîte
+    for patch, color in zip(box['boxes'], color_palette):
+        patch.set_facecolor(color)
+    
+    plt.title("Distribution des Distances", fontsize=16)
+    plt.xlabel("Paires de phrases")
+    plt.ylabel("Distance")
+    
+    # Sauvegarde du graphique dans un buffer
+    buf = BytesIO()
+    plt.savefig(buf, format="png", transparent=True)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+    plt.close()
+    
+    return f"data:image/png;base64,{image_base64}"
+
+# Fonction pour générer un boxplot des fréquences des mots
+def plot_number_of_words_boxplot(text_data: List[str]) -> base64:
+    """ Fonction pour générer un boxplot du nombre de mots par phrase.
+    
+    Args:
+        text_data (List[str]): Liste des phrases.
+        
+    Returns:
+        base64: Image encodée en base64.
+    """
+    # Calculer le nombre de mots par phrase
+    word_counts = [len(phrase.split()) for phrase in text_data]
+    
+    # Création de la palette de couleurs personnalisée
+    color_palette = sns.color_palette("viridis", len(word_counts))
+    
+    # Création du boxplot avec matplotlib
+    plt.figure(figsize=(11, 5))
+    box = plt.boxplot(word_counts, vert=False, patch_artist=True)  # boxplot horizontal
+    
+    # Appliquer la couleur de fond à chaque boîte
+    for patch, color in zip(box['boxes'], color_palette):
+        patch.set_facecolor(color)
+    
+    plt.title("Distribution du Nombre de Mots par Phrase", fontsize=16)
+    plt.xlabel("Nombre de mots par phrase")
+    plt.ylabel("Phrases")
+    
+    # Affichage de la moyenne et de l'écart type
+    plt.axvline(np.mean(word_counts), color='r', linestyle='--', label='Moyenne')
+    plt.axvline(np.std(word_counts), color='g', linestyle='--', label="Écart type")
+    plt.legend(loc='upper right')
+    
+    # Sauvegarde du boxplot dans un buffer
+    buf = BytesIO()
+    plt.savefig(buf, format="png", transparent=True)
+    buf.seek(0)
+    image_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
+    plt.close()
+    
+    return f"data:image/png;base64,{image_base64}"
