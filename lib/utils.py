@@ -10,12 +10,12 @@ import seaborn as sns
 from typing import List, Tuple, Dict
 import pandas as pd
 
-def plot_knn_graph(k: int, distance_matrix: List[float][float], corpus_sans_poc: List[str], selected_index: int) -> base64:
+def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: List[str], selected_index: int) -> base64:
     """génère un graphique de réseau pour les k plus proches voisins d'un document sélectionné.
 
     Args:
         k (int): nombre de voisins les plus proches à afficher
-        distance_matrix (List[float][float]): matrice de distance entre les documents
+        distance_matrix (List[List[float]]): matrice de distance entre les documents
         corpus_sans_poc (List[str]): corpus de documents sans ponctuation
         selected_index (int): index du document sélectionné
 
@@ -101,7 +101,7 @@ def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: List[str])
     
     return corpus_stopwords, list_mot_stopwords
 
-def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str) -> List[float][float]:
+def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de backbofwords selon le choix de l'utilisateur.
 
     Args:
@@ -110,7 +110,7 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
         choix1 (str): choix de l'utilisateur
 
     Returns:
-        List[float][float]: matrice du descripteur (backbofwords)
+        List[List[float]]: matrice du descripteur (backbofwords)
     """
     if choix1 == "1":
         return backbofwordsBinaire(corpus_sans_poc, liste_mots)
@@ -129,15 +129,15 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
     else:
         return tf_idf_new(corpus_sans_poc, liste_mots)
 
-def get_distance_matrix(list_backbofwords: List[float][float], distance: str) -> List[float][float]:
+def get_distance_matrix(list_backbofwords: List[List[float]], distance: str) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de distance selon le choix de l'utilisateur.
 
     Args:
-        list_backbofwords (List[float][float]): matrice du descripteur (backbofwords)
+        list_backbofwords (List[List[float]]): matrice du descripteur (backbofwords)
         distance (str): nom de la distance
 
     Returns:
-        List[float][float]: matrice de distance
+        List[List[float]]: matrice de distance
     """
     if distance == "Euclidienne":
         return matrix_distance_Euclidienne(list_backbofwords)
@@ -154,14 +154,14 @@ def get_distance_matrix(list_backbofwords: List[float][float], distance: str) ->
     else:
         return matrix_distance_Manhattan(list_backbofwords)
 
-def get_k_nearest_phrases(corpus_sans_poc: List[str], selected_phrase_index: int, k: int, distance_matrix: List[float][float]) -> List[str]:
+def get_k_nearest_phrases(corpus_sans_poc: List[str], selected_phrase_index: int, k: int, distance_matrix: List[List[float]]) -> List[str]:
     """ Fonction pour obtenir les k plus proches voisins d'un document sélectionné.
 
     Args:
         corpus_sans_poc (List[str]): corpus de documents sans ponctuation
         selected_phrase_index (int): index du document sélectionné
         k (int): nombre de voisins les plus proches à afficher
-        distance_matrix (List[float][float]): matrice de distance entre les documents
+        distance_matrix (List[List[float]]): matrice de distance entre les documents
 
     Returns:
         List[str]: liste des k plus proches voisins

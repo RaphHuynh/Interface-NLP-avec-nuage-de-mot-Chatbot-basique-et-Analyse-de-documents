@@ -1,6 +1,16 @@
 import math
+from typing import List
 
-def similarite_cosinus(vecteur_1, vecteur_2):
+def similarite_cosinus(vecteur_1: str, vecteur_2: str) -> float:
+    """Calcul de la similarité cosinus entre deux vecteurs.
+    
+    Args:
+        vecteur_1 (str): premier vecteur
+        vecteur_2 (str): deuxième vecteur
+        
+    Returns:
+        float: similarité cosinus
+    """
     # Calcul du produit scalaire
     produit_scalaire = sum(a * b for a, b in zip(vecteur_1, vecteur_2))
 
@@ -17,14 +27,31 @@ def similarite_cosinus(vecteur_1, vecteur_2):
 
     return similarite
 
-def distance_cosinus(vecteur_1, vecteur_2):
+def distance_cosinus(vecteur_1: str, vecteur_2: str) -> float:
+    """Calcul de la distance cosinus entre deux vecteurs.
+    
+    Args:
+        vecteur_1 (str): premier vecteur
+        vecteur_2 (str): deuxième vecteur
+        
+    Returns:
+        float: distance cosinus
+    """
     # Calcul de la similarité cosinus
     similarite = similarite_cosinus(vecteur_1, vecteur_2)
 
     # Calcul de la distance cosinus
     return 1 - similarite
 
-def matrice_distance_cosinus(corpus):
+def matrice_distance_cosinus(corpus: List[str]) -> List[List[float]]:
+    """Calcul de la matrice de distance cosinus.
+    
+    Args:
+        corpus (List[str]): liste des vecteurs
+        
+    Returns:
+        List[List[float]]: matrice de distance cosinus
+    """
     taille = len(corpus)
     matrice = [[0 for _ in range(taille)] for _ in range(taille)]
 

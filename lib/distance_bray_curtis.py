@@ -1,4 +1,15 @@
-def distance_bray_curtis(vecteur_1, vecteur_2):
+from typing import List
+
+def distance_bray_curtis(vecteur_1: str, vecteur_2: str) -> float:
+    """Calcul de la distance de Bray-Curtis entre deux vecteurs.
+    
+    Args:
+        vecteur_1 (str): premier vecteur
+        vecteur_2 (str): deuxième vecteur
+        
+    Returns:
+        float: distance de Bray-Curtis
+    """
     # Calcul de la somme des différences absolues
     somme_diff_absolue = sum(abs(a - b) for a, b in zip(vecteur_1, vecteur_2))
 
@@ -12,7 +23,15 @@ def distance_bray_curtis(vecteur_1, vecteur_2):
     # Calcul de la distance de Bray-Curtis
     return somme_diff_absolue / somme_valeurs_absolues
 
-def matrice_distance_bray_curtis(corpus):
+def matrice_distance_bray_curtis(corpus: List[str]) -> List[List[float]]:
+    """Calcul de la matrice de distance de Bray-Curtis.
+    
+    Args:
+        corpus (List[str]): liste des vecteurs
+        
+    Returns:
+        List[List[float]]: matrice de distance de Bray-Curtis
+    """
     taille = len(corpus)
     matrice = [[0 for _ in range(taille)] for _ in range(taille)]
 

@@ -1,6 +1,16 @@
 import math
+from typing import List
 
-def tf_idf_new(corpus,list_mot):
+def tf_idf_new(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
+    """ Calcule la matrice TF-IDF pour un corpus donné.
+    
+    Args:
+        corpus (List[str]): Le corpus de documents.
+        list_mot (List[str]): La liste des mots du corpus.
+        
+    Returns:
+        List[List[float]]: La matrice TF-IDF.
+    """
     # Initialiser la matrice TF-IDF
     matrix_tf_idf = [[0 for _ in list_mot] for _ in corpus]
 

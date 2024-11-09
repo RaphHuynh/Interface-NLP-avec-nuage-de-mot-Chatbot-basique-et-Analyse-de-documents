@@ -1,14 +1,16 @@
 import math
-def tf_idf_occ(list_mot, corpus):
+from typing import List
+
+def tf_idf_occ(list_mot: List[str: str], corpus: List[str]) -> List[List[float]]:
     """
     Calcule la matrice TF-IDF pour un corpus donné.
 
     Args:
-        corpus (list): La liste des documents.
-        list_mot (list): La liste des mots.
+        list_mot (List[str]): La liste des mots du corpus.
+        corpus (List[str]): Le corpus de documents
 
     Returns:
-        list: La matrice TF-IDF.
+        List[List[float]]: La matrice TF-IDF.
     """
     # Initialiser la matrice TF-IDF
     matrix_tf_idf = [[0 for _ in list_mot] for _ in corpus]

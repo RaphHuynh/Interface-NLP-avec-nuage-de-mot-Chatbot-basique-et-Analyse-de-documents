@@ -1,15 +1,16 @@
 import math
+from typing import List
 
-def tf_idf_bin(corpus,list_mot):
+def tf_idf_bin(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
     """
     Calcule la matrice TF-IDF binaire pour un corpus donné.
 
     Args:
-        corpus (list): La liste des documents.
-        list_mot (list): La liste des mots.
+        corpus (List[str]): Le corpus de documents.
+        list_mot (List[str]): La liste des mots du corpus.
 
     Returns:
-        list: La matrice TF-IDF binaire.
+        List[List[float]]: La matrice TF-IDF binaire.
     """
     # Initialiser la matrice TF-IDF
     matrix_tf_idf = [[0 for _ in list_mot] for _ in corpus]

@@ -1,6 +1,18 @@
 from lib import *
+from typing import List
 
-def matrice_similarite(corpus, list_mot, distance_func, descripteur_func):
+def matrice_similarite(corpus: List[str], list_mot: List[str], distance_func: str, descripteur_func: str) -> List[List[float]]:
+    """ Calcule la matrice de similarité entre les vecteurs de mots de chaque phrase du corpus
+    
+    Args:
+        corpus (List[str]): corpus de phrases
+        list_mot (List[str]): liste de mots
+        distance_func (str): fonction de distance
+        descripteur_func (str): fonction de descripteur
+        
+    Returns:
+        List[List[float]]: matrice de similarité
+    """
     matrix = [[0 for _ in corpus] for _ in corpus]
 
     if descripteur_func == "1":
