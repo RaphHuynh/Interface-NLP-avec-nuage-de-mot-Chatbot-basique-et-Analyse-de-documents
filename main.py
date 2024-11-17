@@ -65,7 +65,7 @@ app_ui = ui.page_fluid(
                 ),
                 ui.input_checkbox("use_stopwords", "Utiliser les stopwords", value=True),
                 ui.input_checkbox("use_stemming", "Utiliser le stemming", value=True),
-                ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
+                ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True, limit=20),
                 ui.output_ui("phrase_selector"),
                 ui.input_slider("k_value", "Nombre de voisins les plus proches (k)", min=1, max=10, value=3, step=1),
                 ui.input_action_button("generate", "Generate", class_="mt-4 w-full bg-black text-white py-2 px-4 rounded"),
