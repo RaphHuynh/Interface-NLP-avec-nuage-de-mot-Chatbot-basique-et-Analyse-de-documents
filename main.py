@@ -65,7 +65,7 @@ app_ui = ui.page_fluid(
                 ),
                 ui.input_checkbox("use_stopwords", "Utiliser les stopwords", value=True),
                 ui.input_checkbox("use_stemming", "Utiliser le stemming", value=True),
-                ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True, limit=20),
+                ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
                 ui.output_ui("phrase_selector"),
                 ui.input_slider("k_value", "Nombre de voisins les plus proches (k)", min=1, max=10, value=3, step=1),
                 ui.input_action_button("generate", "Generate", class_="mt-4 w-full bg-black text-white py-2 px-4 rounded"),
@@ -112,12 +112,22 @@ def server(input, output, session):
     @reactive.Effect
     @reactive.event(input.file_input)
     def update_k_value_max():
-        if input.file_input():
+        if input.file_input() and len(input.file_input()) == 1:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
                 contenu = f.read()
             corpus = separer_phrase(contenu)
             corpus_sans_poc = supp_poc_corpus(corpus)
+            phrases.set(corpus_sans_poc)
+            ui.update_slider("k_value", max=len(corpus_sans_poc)-1)
+        elif input.file_input() and len(input.file_input()) > 1:
+            object_corpus = Corpus()
+            for file in input.file_input():
+                with open(file['datapath'], 'r', encoding='utf-8') as f:
+                    text = f.read()
+                    object_corpus.add_document(text)
+            corpus = object_corpus.list_documents
+            corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
             phrases.set(corpus_sans_poc)
             ui.update_slider("k_value", max=len(corpus_sans_poc)-1)
         else:
@@ -174,7 +184,7 @@ def server(input, output, session):
         distance_matrix = get_distance_matrix(list_backbofwords, distance)
 
         k = input.k_value()
-        k_nearest_phrases = get_k_nearest_phrases(corpus_sans_poc, selected_phrase_index.get(), k, distance_matrix)
+        k_nearest_phrases = get_k_nearest_phrases(corpus, selected_phrase_index.get(), k, distance_matrix)
         k_max = len(corpus_sans_poc_stopword) - 1
 
         # Générer le graphe des k plus proches voisins
@@ -194,13 +204,14 @@ def server(input, output, session):
          
         #Générer le boxplot des distances
         distance_boxplot = plot_distance_boxplot(distance_matrix)
-
+        
+        words_boxplot = plot_number_of_words_boxplot(corpus_sans_poc)
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),
             ui.div(
                 ui.h4("Phrase sélectionnée :", class_="text-lg font-semibold mb-2"),
-                ui.p(corpus_sans_poc[selected_phrase_index.get()] if selected_phrase_index.get() is not None else "Aucune phrase sélectionnée."),
+                ui.p(corpus[selected_phrase_index.get()] if selected_phrase_index.get() is not None else "Aucune phrase sélectionnée."),
                 class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
             ),
             ui.div(
@@ -262,8 +273,8 @@ def server(input, output, session):
             ui.div(
                 ui.h4("Boxplot des fréquences des mots par phrase", class_="text-lg font-semibold mb-2 text-center"),
                 ui.div(
-                    ui.p("Le boxplot des fréquences des mots par phrase représente la distribution des fréquences des mots dans chaque phrase. Il permet de visualiser la variabilité des fréquences des mots dans les phrases du corpus. On peut donc observer si les phrases sont plus ou moins homogènes, courtes ou longues."),
-                    ui.img(src=plot_number_of_words_boxplot(corpus_sans_poc), class_="w-full max-w-3xl mx-auto"),
+                    ui.p("Le boxplot des fréquences des mots par phrase représente la distribution des fréquences des mots dans chaque phrase. Il permet de visualiser la variabilité des fréquences des mots dans les phrases du corpus. On peut donc observer si les phrases sont plus ou moins homogènes, courtes ou longues. Dans le cadre où il y a plusieurs documents, le boxplot représente la distribution des fréquences des mots dans chaque document."),
+                    ui.img(src=words_boxplot, class_="w-full max-w-3xl mx-auto"),
                     class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
                 ),
                 class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
