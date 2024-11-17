@@ -1,8 +1,6 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
-from lib import matrice_similarite
-from lib.utils import *
 
 app_ui = ui.page_fluid(
     ui.tags.head(
@@ -66,6 +64,7 @@ app_ui = ui.page_fluid(
                     selected="Euclidienne"
                 ),
                 ui.input_checkbox("use_stopwords", "Utiliser les stopwords", value=True),
+                ui.input_checkbox("use_stemming", "Utiliser le stemming", value=True),
                 ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
                 ui.output_ui("phrase_selector"),
                 ui.input_slider("k_value", "Nombre de voisins les plus proches (k)", min=1, max=10, value=3, step=1),
@@ -143,28 +142,16 @@ def server(input, output, session):
         uploaded_file = input.file_input()
         
         if len(uploaded_file) > 1:
-            contenu = []
+            object_corpus = Corpus()
             for file in uploaded_file:
                 with open(file['datapath'], 'r', encoding='utf-8') as f:
-                    contenu+=[f.read()]
-            corpus = contenu
-            print(len(corpus))
-            for c in corpus:
-                print(c)
-                print("---------")
-                corpus_sans_poc = retirer_ponctuation(c)
-            corpus_sans_poc = corpus_sans_poc.lower()
-                
-            print(corpus_sans_poc)    
-                
-            liste_mots = []
-            for c in corpus_sans_poc:
-                liste_mots+=(retirer_doublons(c))
-            if input.use_stopwords():
-                corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
-            else:
-                corpus_sans_poc_stopword = corpus_sans_poc
-                liste_mots_stopword = liste_mots
+                    text = f.read()
+                    object_corpus.add_document(text)
+            corpus = object_corpus.list_documents
+            corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
+            phrases.set(corpus_sans_poc)
+            
+            liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
         else:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
@@ -175,11 +162,12 @@ def server(input, output, session):
             phrases.set(corpus_sans_poc)
 
             liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
-            if input.use_stopwords():
-                corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
-            else:
-                corpus_sans_poc_stopword = corpus_sans_poc
-                liste_mots_stopword = liste_mots
+            
+        if input.use_stopwords():
+            corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
+        else:
+            corpus_sans_poc_stopword = corpus_sans_poc
+            liste_mots_stopword = liste_mots
 
         list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1())
         distance = input.choix2()
