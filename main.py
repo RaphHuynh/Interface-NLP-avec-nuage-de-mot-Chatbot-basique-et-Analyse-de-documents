@@ -205,7 +205,7 @@ def server(input, output, session):
         #Générer le boxplot des distances
         distance_boxplot = plot_distance_boxplot(distance_matrix)
         
-        words_boxplot = plot_number_of_words_boxplot(corpus_sans_poc)
+        words_boxplot = plot_number_of_words_boxplot(corpus_sans_poc)        
 
         return ui.div(
             ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),

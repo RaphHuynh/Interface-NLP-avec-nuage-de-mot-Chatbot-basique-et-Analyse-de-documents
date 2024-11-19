@@ -10,6 +10,9 @@ import seaborn as sns
 from typing import List, Tuple, Dict
 import pandas as pd
 import math
+from .utils import *
+from .descripteur import *
+from .distance import *
 
 def count_words_per_phrase(corpus: List[str]) -> List[int]:
     """Compte le nombre de mots par phrase dans un corpus.
@@ -369,7 +372,7 @@ def plot_number_of_words_boxplot(text_data: List[str]) -> base64:
         patch.set_facecolor(color)
     
     plt.title("Distribution du Nombre de Mots par Phrase", fontsize=16)
-    plt.xlabel("Nombre de mots par phrase")
+    plt.xlabel("Nombre de mots par phrase ou document")
     plt.ylabel("Phrases")
     
     # Affichage de la moyenne et de l'écart type

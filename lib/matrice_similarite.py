@@ -1,5 +1,7 @@
 from lib import *
 from typing import List
+from .distance import *
+from .descripteur import *
 
 def matrice_similarite(corpus: List[str], list_mot: List[str], distance_func: str, descripteur_func: str) -> List[List[float]]:
     """ Calcule la matrice de similarité entre les vecteurs de mots de chaque phrase du corpus

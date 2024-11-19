@@ -1,5 +1,5 @@
 import math
-from .backofword_occurence import backbofwords_occurence
+from .descripteur.backofword_occurence import backbofwords_occurence
 from typing import List
 
 def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: List[str]) -> List[List[float]]:
