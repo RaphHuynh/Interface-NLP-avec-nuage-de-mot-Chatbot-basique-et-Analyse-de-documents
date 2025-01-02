@@ -1,5 +1,7 @@
 from lib import *
 from typing import List
+
+from lib.matrix_normalise import matrix_backbofwords_normalize_Norme, matrix_backbofwords_normalize_proba
 from .distance import *
 from .descripteur import *
 

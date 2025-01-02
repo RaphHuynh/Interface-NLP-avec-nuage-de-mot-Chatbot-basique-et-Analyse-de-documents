@@ -1,6 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
+from lib.utils import descriptor_select_distance
 
 app_ui = ui.page_fluid(
     ui.tags.head(

@@ -10,6 +10,7 @@ import seaborn as sns
 from typing import List, Tuple, Dict
 import pandas as pd
 import math
+from lib.matrix_normalise import matrix_backbofwords_normalize_Norme, matrix_backbofwords_normalize_proba
 from .utils import *
 from .descripteur import *
 from .distance import *

@@ -38,8 +38,6 @@ def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: 
     """
     matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
-    
-    print("normalise")
 
     for i in range(len(matrix)):
         somme = math.sqrt(sum([x ** 2 for x in matrix[i]]))
