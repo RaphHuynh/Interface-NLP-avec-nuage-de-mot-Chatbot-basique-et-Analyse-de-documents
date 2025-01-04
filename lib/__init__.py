@@ -17,3 +17,4 @@ from .matrice_similarite import *
 from .k_plus_proches_documents import *
 from .utils import *
 from .models import *
+from .spacy_nltk import *

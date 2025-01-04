@@ -9,7 +9,7 @@ def retirer_ponctuation(doc: str) -> str:
     Returns:
         str: document sans ponctuation
     """
-    ponctuations = ['.', ',', '!', '?', ':', ';', '(', ')', '-', '_', '"', "'", '...', '—', '/']
+    ponctuations = ['.', ',', '!', '?', ':', ';', '(', ')', '-', '_', '"', "'", '...', '—', '/',"'", '’', '‘', '“', '”', '«', '»', '–','…']
     for ponctuation in ponctuations:
         doc = doc.replace(ponctuation, ' ')
     return doc
