@@ -105,4 +105,4 @@ def separer_phrase(contenu: str) -> List[str]:
     phrases_finales = []
     for phrase in phrases_temp:
         phrases_finales.extend(phrase.split('?'))
-    return [phrase.strip() for phrase in phrases_finales if phrase.strip()]
+    return [phrase.strip() for phrase in phrases_finales if len(phrase.strip().split()) > 1]
