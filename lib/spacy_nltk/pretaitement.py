@@ -1,3 +1,4 @@
+import string
 import spacy
 from typing import List
 
@@ -34,99 +35,36 @@ def get_nlp_model(langue: str):
     return nlp_fr if langue == 'fr' else nlp_en
 
 
-def retirer_ponctuation_spacy(doc: str) -> str:
+def diviser_texte_phrase_spacy(texte: str) -> List[str]:
     """
-    Retire la ponctuation d'un document en utilisant SpaCy.
+    Divise un texte en phrases en utilisant SpaCy.
 
     Args:
-        doc (str): Document à traiter.
+        texte (str): Texte à diviser.
 
     Returns:
-        str: Document sans ponctuation.
+        List[str]: Liste des phrases.
     """
-    langue = detecter_langue(doc)
-    nlp = get_nlp_model(langue)
-    doc_spacy = nlp(doc)
-    return " ".join([token.text for token in doc_spacy if not token.is_punct])
+    nlp = get_nlp_model(detecter_langue(texte))
+    doc = nlp(texte)
+    return [phrase.text for phrase in doc.sents]
 
-
-def supp_poc_corpus_spacy(corpus: List[str]) -> List[str]:
+def get_tokens(textes: List[str]) -> List[str]:
     """
-    Supprime la ponctuation d'un corpus de documents et retourne le corpus sans ponctuation.
+    Tokenise une liste de textes en utilisant SpaCy.
 
     Args:
-        corpus (List[str]): Corpus de documents.
+        textes (List[str]): Liste de textes à tokeniser.
 
     Returns:
-        List[str]: Corpus de documents sans ponctuation.
+        List[str]: Liste des tokens.
     """
-    return [retirer_ponctuation_spacy(doc) for doc in corpus]
-
-
-def split_phrase_mot_spacy(corpus: str) -> List[str]:
-    """
-    Sépare un document en phrases et les phrases en mots.
-
-    Args:
-        corpus (str): Document à traiter.
-
-    Returns:
-        List[str]: Liste des mots.
-    """
-    langue = detecter_langue(corpus)
-    nlp = get_nlp_model(langue)
-    doc_spacy = nlp(corpus)
-    return [token.text for token in doc_spacy if not token.is_punct and not token.is_space]
-
-
-def split_doc_mot_spacy(corpus: List[str]) -> List[str]:
-    """
-    Crée une liste de mots à partir d'un corpus.
-
-    Args:
-        corpus (List[str]): Corpus de documents.
-
-    Returns:
-        List[str]: Liste de mots.
-    """
-    liste_mots_totale = []
-    for doc in corpus:
-        mots = split_phrase_mot_spacy(doc)
-        liste_mots_totale.extend(mots)
-    return liste_mots_totale
-
-
-def retirer_doublons_spacy(corpus: List[str]) -> List[str]:
-    """
-    Retire les doublons d'une liste de mots en ignorant la casse.
-
-    Args:
-        corpus (List[str]): Liste de mots.
-
-    Returns:
-        List[str]: Liste de mots sans doublons.
-    """
-    vus = set()
-    liste_sans_doublons = []
-    for mot in corpus:
-        mot_lower = mot.lower()
-        if mot_lower not in vus:
-            liste_sans_doublons.append(mot_lower)
-            vus.add(mot_lower)
-    return liste_sans_doublons
-
-
-def separer_phrase_spacy(contenu: str) -> List[str]:
-    """
-    Sépare un contenu en phrases en utilisant SpaCy.
-
-    Args:
-        contenu (str): Contenu à traiter.
-
-    Returns:
-        List[str]: Liste de phrases.
-    """
-    langue = detecter_langue(contenu)
-    nlp = get_nlp_model(langue)
-    doc_spacy = nlp(contenu)
-    return [sent.text.strip() for sent in doc_spacy.sents if len(sent.text.split()) > 1]
+    tokens = []
+    for texte in textes:
+        nlp = get_nlp_model(detecter_langue(texte))
+        doc = nlp(texte)
+        tokens.extend(
+            t.text.lower().strip() for t in doc
+            if t.text not in string.punctuation and t.text not in [' ', '...']
+        )
+    return tokens

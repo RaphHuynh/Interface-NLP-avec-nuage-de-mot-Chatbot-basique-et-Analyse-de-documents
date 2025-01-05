@@ -50,7 +50,7 @@ app_ui = ui.page_fluid(
         # Sidebar
         ui.div(
             ui.div(
-                ui.h2("Menu", class_="text-2xl font-bold mb-4 border-b border-gray-300 pb-3"),
+                ui.h2("Menu", class_="text-2xl text-center font-bold mb-4 border-b border-gray-300 pb-3"),
                 ui.input_select("lang_select", "", choices={"Français": "🇫🇷 Français", "English": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 English"}, selected="Français"),
                 ui.p("Descripteur", class_="mt-4"),
                 ui.input_select(
@@ -117,7 +117,7 @@ def server(input, output, session):
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
                 contenu = f.read()
-            corpus = separer_phrase_spacy(contenu)
+            corpus = separer_phrase(contenu)
             corpus_sans_poc = supp_poc_corpus(corpus)
             phrases.set(corpus_sans_poc)
             ui.update_slider("k_value", max=len(corpus_sans_poc)-1)
@@ -164,18 +164,18 @@ def server(input, output, session):
             
             print(corpus_sans_poc)
             
-            liste_mots = retirer_doublons_spacy(split_doc_mot_spacy(corpus_sans_poc))
+            liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             print(liste_mots)
         else:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
                 contenu = f.read()
 
-            corpus = separer_phrase_spacy(contenu)
+            corpus = separer_phrase(contenu)
             corpus_sans_poc = supp_poc_corpus(corpus)
             phrases.set(corpus_sans_poc)
 
-            liste_mots = retirer_doublons_spacy(split_doc_mot_spacy(corpus_sans_poc))
+            liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             
         if input.use_stopwords():
             corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)

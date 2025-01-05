@@ -1,4 +1,7 @@
 from typing import List
+import spacy
+import re
+
 
 def retirer_ponctuation(doc: str) -> str:
     """ Retire la ponctuation d'un document
@@ -90,7 +93,9 @@ def retirer_doublons(corpus: List[str]) -> List[str]:
     return liste_sans_doublons
 
 def separer_phrase(contenu: str) -> List[str]:
-    """ Sépare un contenu en phrases
+    """Sépare un contenu en phrases sans séparer les abréviations courantes,
+    tout en reconnaissant des sous-phrases introduites par un motif spécifique
+    comme 'bla: Yes, we can.'.
     
     Args:
         contenu (str): contenu à traiter
@@ -98,11 +103,48 @@ def separer_phrase(contenu: str) -> List[str]:
     Returns:
         List[str]: liste de phrases 
     """
-    phrases = contenu.split('.')
-    phrases_temp = []
-    for phrase in phrases:
-        phrases_temp.extend(phrase.split('!'))
-    phrases_finales = []
-    for phrase in phrases_temp:
-        phrases_finales.extend(phrase.split('?'))
-    return [phrase.strip() for phrase in phrases_finales if len(phrase.strip().split()) > 1]
+    # Liste des abréviations courantes à préserver
+    abrev = ['Mr.', 'Mme.', 'Dr.', 'Prof.', 'Sr.', 'Jr.', 'Sen.', 'Pres.', 
+             'Gen.', 'Rep.', 'St.', 'Mlle.', 'Gov.']
+    
+    # Protéger temporairement les abréviations
+    for ab in abrev:
+        contenu = contenu.replace(ab, ab.replace('.', '###'))
+    
+    # Gérer le cas spécifique: "mot: Mot, mot mot."
+    # On remplace ce motif par deux phrases séparées
+    contenu = re.sub(
+        r'(\b\w+\b):\s([A-Z][a-z]+,\s[a-z]+\s[a-z]+)\.',  # Motif regex
+        r'\1. \2.',  # Remplacement : sépare les deux phrases
+        contenu
+    )
+    
+    # Découper par les principaux délimiteurs de fin de phrase
+    phrases = re.split(r'[.!?]', contenu)
+    
+    # Nettoyer les sous-phrases et gérer les espaces
+    phrases = [phrase.strip() for phrase in phrases if phrase.strip()]
+    
+    # Rétablir les abréviations
+    for i in range(len(phrases)):
+        for ab in abrev:
+            phrases[i] = phrases[i].replace(ab.replace('.', '###'), ab)
+    
+    return phrases
+
+def separer_phrase_spacy(contenu: str, lang: str) -> List[str]:
+    """ Sépare un contenu en phrases sans séparer les abréviations courantes
+    
+    Args:
+        contenu (str): contenu à traiter
+        
+    Returns:
+        List[str]: liste de phrases 
+    """
+    if lang == 'Français':
+        nlp = spacy.load("fr_core_news_sm")
+    else:
+        nlp = spacy.load("en_core_web_sm")
+    doc = nlp(contenu)
+    phrases = [sent.text for sent in doc.sents]
+    return phrases  
