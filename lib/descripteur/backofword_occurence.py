@@ -1,6 +1,6 @@
 from typing import List
 
-def backbofwords_occurence(list_phrase: List[str], list_mot: List[str]) -> List[List[int]]:
+def backbofwords_occurence(list_phrase: List[str], list_mot: List[str], stemming: int) -> List[List[int]]:
     """ bag of words occurence
     
     Args:

@@ -1,7 +1,7 @@
 import math
 from typing import List
 
-def tf_idf_bin(corpus: List[str],list_mot: List[str]) -> List[List[float]]:
+def tf_idf_bin(corpus: List[str],list_mot: List[str], stemming: int) -> List[List[float]]:
     """
     Calcule la matrice TF-IDF binaire pour un corpus donné.
 

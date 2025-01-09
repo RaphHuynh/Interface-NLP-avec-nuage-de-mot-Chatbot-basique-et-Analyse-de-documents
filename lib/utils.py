@@ -125,7 +125,7 @@ def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: List[str])
     
     return corpus_stopwords, list_mot_stopwords
 
-def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str) -> List[List[float]]:
+def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str, stemming: int) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de backbofwords selon le choix de l'utilisateur.
 
     Args:
@@ -137,21 +137,21 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
         List[List[float]]: matrice du descripteur (backbofwords)
     """
     if choix1 == "1":
-        return backbofwordsBinaire(corpus_sans_poc, liste_mots)
+        return backbofwordsBinaire(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "2":
-        return backbofwords_occurence(corpus_sans_poc, liste_mots)
+        return backbofwords_occurence(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "3":
-        return matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots)
+        return matrix_backbofwords_normalize_proba(corpus_sans_poc, liste_mots , stemming)
     elif choix1 == "4":
-        return matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots)
+        return matrix_backbofwords_normalize_Norme(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "5":
-        return tf_idf_bin(corpus_sans_poc, liste_mots)
+        return tf_idf_bin(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "6":
-        return tf_idf_occ(corpus_sans_poc, liste_mots)
+        return tf_idf_occ(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "7":
-        return tf_idf_norm(corpus_sans_poc, liste_mots)
+        return tf_idf_norm(corpus_sans_poc, liste_mots, stemming)
     else:
-        return tf_idf_new(corpus_sans_poc, liste_mots)
+        return tf_idf_new(corpus_sans_poc, liste_mots, stemming)
 
 def get_distance_matrix(list_backbofwords: List[List[float]], distance: str) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de distance selon le choix de l'utilisateur.

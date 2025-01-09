@@ -179,8 +179,24 @@ def server(input, output, session):
             corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
             phrases.set(corpus_sans_poc)
             
-            liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
-            print(len(liste_mots))
+            if selected_stemming == "1":
+                print("Porter Stemmer")
+                liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "2":
+                print("Snowball Stemmer")
+                liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "3":
+                print("Lancaster Stemmer")
+                liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "4":
+                print("WordNet Lemmatiser")
+                liste_mots = wordnet_lemmatizer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "5":
+                print("Lovins Stemmer")
+                liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            else:
+                print("Aucun Stemming")
+                liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
         else:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
@@ -190,21 +206,32 @@ def server(input, output, session):
             corpus_sans_poc = supp_poc_corpus(corpus)
             phrases.set(corpus_sans_poc)
 
-            liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
-            print(len(liste_mots))
+            if selected_stemming == "1":
+                print("Porter Stemmer")
+                liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "2":
+                print("Snowball Stemmer")
+                liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "3":
+                print("Lancaster Stemmer")
+                liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "4":
+                print("WordNet Lemmatiser")
+                liste_mots = wordnet_lemmatizer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            elif selected_stemming == "5":
+                print("Lovins Stemmer")
+                liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+            else:
+                print("Aucun Stemming")
+                liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             
         if selected_stopwords != "5":
             corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
         else:
             corpus_sans_poc_stopword = corpus_sans_poc
             liste_mots_stopword = liste_mots
-            
-        if selected_stemming != "6":
-            corpus_sans_poc_stopword = porter_stemmer(corpus_sans_poc_stopword)
-            liste_mots_stopword = porter_stemmer(liste_mots)
 
-
-        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1())
+        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming)
         distance = input.choix2()
         distance_matrix = get_distance_matrix(list_backbofwords, distance)
 
