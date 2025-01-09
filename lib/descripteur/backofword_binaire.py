@@ -1,5 +1,7 @@
 from typing import List
 
+from lib.spacy_nltk.stemming import *
+
 def backbofwordsBinaire(list_phrase: List[str], list_mot: List[str]) -> List[List[int]]:
     """ bag of words binaire
 
@@ -11,7 +13,9 @@ def backbofwordsBinaire(list_phrase: List[str], list_mot: List[str]) -> List[Lis
         List[List[int]]: liste des vecteurs de back of words
     """
     list_backbofwords = [[0 for _ in list_mot] for _ in list_phrase]
-    list_phrases = [phrase.lower() for phrase in list_phrase]
+    list_phrases = []
+    for phrase in list_phrase:
+        list_phrases.append(phrase.lower())
     list_mots = [mot.lower() for mot in list_mot]
 
     for indice in range(len(list_phrases)):

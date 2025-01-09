@@ -64,8 +64,10 @@ app_ui = ui.page_fluid(
                     choices=descriptor_select_distance("1"),
                     selected="Euclidienne"
                 ),
-                ui.input_checkbox("use_stopwords", "Utiliser les stopwords", value=True),
-                ui.input_checkbox("use_stemming", "Utiliser le stemming", value=True),
+                ui.p("Stopwords", class_="mt-4"),
+                ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"Aucun"}, selected="5"),
+                ui.p("Stemming & Lemmatisation", class_="mt-4"),
+                ui.input_select("stemming", "", choices={"1": "Porter Stemmer", "2": "Snowball Stemmer", "3":"Lancaster Stemmer", "4":"wordNet Lemmatiser", "5":"Lovins Stemmer", "6":"Aucun"}, selected="6"),
                 ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
                 ui.output_ui("phrase_selector"),
                 ui.input_slider("k_value", "Nombre de voisins les plus proches (k)", min=1, max=10, value=3, step=1),
@@ -86,6 +88,8 @@ app_ui = ui.page_fluid(
 # Mise à jour de la fonction de rendu pour inclure le graphe
 def server(input, output, session):
     lang = reactive.Value("Français")
+    stopwords = reactive.Value("Aucun")
+    stemming = reactive.Value("Aucun")
     phrases = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
@@ -95,6 +99,16 @@ def server(input, output, session):
     @reactive.event(input.lang_select)
     def update_lang():
         lang.set(input.lang_select())
+        
+    @reactive.Effect
+    @reactive.event(input.stopwords)
+    def update_stopwords():
+        stopwords.set(input.stopwords())
+        
+    @reactive.Effect
+    @reactive.event(input.stemming)
+    def update_stemming():
+        stemming.set(input.stemming())
 
     @reactive.Effect
     @reactive.event(input.phrase_select)
@@ -144,6 +158,9 @@ def server(input, output, session):
     @render.ui
     def content():
         selected_lang = lang.get()
+        selected_stopwords = stopwords.get()
+        selected_stemming = stemming.get()
+        
         if not input.file_input():
             return ui.p("Veuillez sélectionner un fichier." if selected_lang == "Français" else "Please select a file.")
 
@@ -162,10 +179,8 @@ def server(input, output, session):
             corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
             phrases.set(corpus_sans_poc)
             
-            print(corpus_sans_poc)
-            
             liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
-            print(liste_mots)
+            print(len(liste_mots))
         else:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
@@ -176,12 +191,18 @@ def server(input, output, session):
             phrases.set(corpus_sans_poc)
 
             liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
+            print(len(liste_mots))
             
-        if input.use_stopwords():
+        if selected_stopwords != "5":
             corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
         else:
             corpus_sans_poc_stopword = corpus_sans_poc
             liste_mots_stopword = liste_mots
+            
+        if selected_stemming != "6":
+            corpus_sans_poc_stopword = porter_stemmer(corpus_sans_poc_stopword)
+            liste_mots_stopword = porter_stemmer(liste_mots)
+
 
         list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1())
         distance = input.choix2()
