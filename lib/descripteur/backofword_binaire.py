@@ -95,7 +95,8 @@ def backbofwordsBinaire(list_phrase: List[str], list_mot: List[str], stemming: s
                 list_phrases.append(phrase.lower())
 
             for indice in range(len(list_phrases)):
-                list_mot_phrase = lovins_stemmer_phrase(list_phrases[indice])
+                list_mot_phrase = lovins_stemmer(list_phrases[indice])
+                print(list_mot_phrase)
                 for mot in list_mot_phrase:
                     if mot in list_mot:
                         list_backbofwords[indice][list_mot.index(mot)] = 1

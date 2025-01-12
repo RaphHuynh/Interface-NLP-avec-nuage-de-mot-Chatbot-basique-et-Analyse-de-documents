@@ -1,6 +1,7 @@
 import nltk
 from nltk.stem import PorterStemmer, LancasterStemmer, SnowballStemmer, WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from stemming.lovins import stem as LovinsStemmer
 
 # Ensure you have the necessary NLTK data files
 nltk.download('wordnet')
@@ -45,14 +46,20 @@ def wordnet_lemmatizer_phrase(phrase, pos='n'):
     return [lemmatizer.lemmatize(word, pos) for word in words]
 
 def lovins_stemmer(text):
-    stemmer = nltk.LovinsStemmer()
-    words = word_tokenize(text)
-    return [stemmer.stem(word) for word in words]
-
-def lovins_stemmer_phrase(phrase):
-    stemmer = nltk.LovinsStemmer()
-    words = word_tokenize(phrase)
-    return [stemmer.stem(word) for word in words]
+    list_mot = text.split()
+    
+    stemmed_words = []
+    for word in list_mot:
+        if word.isalpha():
+            try:
+                stemmed_word = LovinsStemmer(word)
+                stemmed_words.append(stemmed_word)
+            except IndexError as e:
+                print(f"Error stemming word: {word}, {e}")
+        else:
+            stemmed_words.append(word)
+    
+    return stemmed_words
 
 def porter2_stemmer(text):
     stemmer = nltk.Porter2Stemmer()

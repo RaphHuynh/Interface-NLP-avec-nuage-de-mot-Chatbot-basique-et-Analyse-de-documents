@@ -191,7 +191,9 @@ def server(input, output, session):
                 flat_list = list(chain.from_iterable(liste_mots))
                 liste_mots = retirer_doublons(flat_list)
             elif selected_stemming == "5":
-                liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+                liste_mots = [lovins_stemmer(phrase.lower()) for phrase in corpus_sans_poc]
+                flat_list = list(chain.from_iterable(liste_mots))
+                liste_mots = retirer_doublons(flat_list)
             else:
                 liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
         else:
@@ -214,7 +216,9 @@ def server(input, output, session):
                 flat_list = list(chain.from_iterable(liste_mots))
                 liste_mots = retirer_doublons(flat_list)
             elif selected_stemming == "5":
-                liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+                liste_mots = [lovins_stemmer(phrase.lower()) for phrase in corpus_sans_poc]
+                flat_list = list(chain.from_iterable(liste_mots))
+                liste_mots = retirer_doublons(flat_list)
             else:
                 liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             
