@@ -14,7 +14,7 @@ def porter_stemmer(list_words):
 def porter_stemmer_phrase(phrase):
     stemmer = PorterStemmer()
     words = word_tokenize(phrase)
-    return [stemmer.stem(word) for word in words]
+    return [stemmer.stem(word) for word in words if word.isalpha()]
 
 def lancaster_stemmer(list_words):
     stemmer = LancasterStemmer()
@@ -23,7 +23,7 @@ def lancaster_stemmer(list_words):
 def lancaster_stemmer_phrase(phrase):
     stemmer = LancasterStemmer()
     words = word_tokenize(phrase)
-    return [stemmer.stem(word) for word in words]
+    return [stemmer.stem(word) for word in words if word.isalpha()]
 
 def snowball_stemmer(text, language='english'):
     stemmer = SnowballStemmer(language)
@@ -32,7 +32,7 @@ def snowball_stemmer(text, language='english'):
 def snowball_stemmer_phrase(phrase, language='english'):
     stemmer = SnowballStemmer(language)
     words = word_tokenize(phrase)
-    return [stemmer.stem(word) for word in words]
+    return [stemmer.stem(word) for word in words if word.isalpha()]
 
 def wordnet_lemmatizer(text, pos='n'):
     lemmatizer = WordNetLemmatizer()
