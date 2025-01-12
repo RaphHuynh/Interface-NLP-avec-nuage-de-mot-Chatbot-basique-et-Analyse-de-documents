@@ -2,6 +2,7 @@ from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
 from lib.utils import descriptor_select_distance
+from itertools import chain
 
 app_ui = ui.page_fluid(
     ui.tags.head(
@@ -180,22 +181,18 @@ def server(input, output, session):
             phrases.set(corpus_sans_poc)
             
             if selected_stemming == "1":
-                print("Porter Stemmer")
                 liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "2":
-                print("Snowball Stemmer")
                 liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "3":
-                print("Lancaster Stemmer")
                 liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "4":
-                print("WordNet Lemmatiser")
-                liste_mots = wordnet_lemmatizer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+                liste_mots = [wordnet_lemmatizer(phrase.lower()) for phrase in corpus_sans_poc]
+                flat_list = list(chain.from_iterable(liste_mots))
+                liste_mots = retirer_doublons(flat_list)
             elif selected_stemming == "5":
-                print("Lovins Stemmer")
                 liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             else:
-                print("Aucun Stemming")
                 liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
         else:
             uploaded_file = input.file_input()[0]
@@ -207,22 +204,18 @@ def server(input, output, session):
             phrases.set(corpus_sans_poc)
 
             if selected_stemming == "1":
-                print("Porter Stemmer")
                 liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "2":
-                print("Snowball Stemmer")
                 liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "3":
-                print("Lancaster Stemmer")
                 liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             elif selected_stemming == "4":
-                print("WordNet Lemmatiser")
-                liste_mots = wordnet_lemmatizer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
+                liste_mots = [wordnet_lemmatizer(phrase.lower()) for phrase in corpus_sans_poc] 
+                flat_list = list(chain.from_iterable(liste_mots))
+                liste_mots = retirer_doublons(flat_list)
             elif selected_stemming == "5":
-                print("Lovins Stemmer")
                 liste_mots = lovins_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
             else:
-                print("Aucun Stemming")
                 liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             
         if selected_stopwords != "5":
