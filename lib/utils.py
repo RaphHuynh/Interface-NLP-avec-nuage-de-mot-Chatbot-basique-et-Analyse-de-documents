@@ -14,6 +14,10 @@ from lib.matrix_normalise import matrix_backbofwords_normalize_Norme, matrix_bac
 from .utils import *
 from .descripteur import *
 from .distance import *
+import nltk
+from nltk.corpus import stopwords as nltk_stopwords
+
+nltk.download('stopwords')
 
 def count_words_per_phrase(corpus: List[str]) -> List[int]:
     """Compte le nombre de mots par phrase dans un corpus.
@@ -95,35 +99,54 @@ def plot_knn_graph(k: int, distance_matrix: List[List[float]], corpus_sans_poc: 
     return f"data:image/png;base64,{img_data}"
 
 
-def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: List[str]) -> Tuple[List[str], List[str]]:
+def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: str) -> Tuple[List[str], List[str]]:
     """Fonction pour supprimer les mots vides d'un corpus et d'une liste de mots.
 
     Args:
         corpus (List[str]): liste des documents
-        list_mot (_type_): liste des mots
-        nom_stop_words (_type_): nom du fichier de mots vides
+        list_mot (List[str]): liste des mots
+        nom_stop_words (str): nom du fichier de mots vides ou type pour utiliser stopwords 'nltk'
 
     Returns:
-        Tuple(List[str][str]): corpus sans mots vides, liste de mots sans mots vides
+        Tuple[List[str], List[str]]: corpus sans mots vides, liste de mots sans mots vides
     """
     base_dir = os.path.dirname(__file__)
-    if nom_stop_words == "en_short":
+    mots_vides = set()
+
+    # Gestion des stopwords via fichiers externes
+    if nom_stop_words == "5":
         path = os.path.join(base_dir, "stopwords/en_short.txt")
-    elif nom_stop_words == "English":
+    elif nom_stop_words == "2":
         path = os.path.join(base_dir, "stopwords/en.txt")
-    else:   
+    elif nom_stop_words == "1":
         path = os.path.join(base_dir, "stopwords/fr.txt")
-        
-    with open(path, "r") as fichier:
-        mots_vides = fichier.read().split("\n")
-            
-    mots_vides = [mot.lower() for mot in mots_vides]
+    elif nom_stop_words == "3":
+        mots_vides = set(nltk_stopwords.words('french'))
+    elif nom_stop_words == "4":
+        mots_vides = set(nltk_stopwords.words('english'))
+
+    # Si des fichiers sont spécifiés, les charger
+    if nom_stop_words in ["1", "2", "5"]:
+        try:
+            with open(path, "r") as fichier:
+                mots_vides = set(fichier.read().splitlines())
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Le fichier des stopwords {path} est introuvable.")
     
+    # Prétraitement des stopwords (convertir en minuscules)
+    mots_vides = {mot.lower() for mot in mots_vides}
+
+    # Filtrage des mots vides dans la liste des mots
     list_mot_stopwords = [mot.lower() for mot in list_mot if mot.lower() not in mots_vides]
+
+    # Traitement du corpus pour enlever les stopwords
     corpus_lower = [doc.lower() for doc in corpus]
-    corpus_stopwords = [" ".join([mot for mot in doc.split() if mot not in mots_vides]) for doc in corpus_lower]
+    corpus_stopwords = [
+        " ".join([mot for mot in doc.split() if mot not in mots_vides]) for doc in corpus_lower
+    ]
     
     return corpus_stopwords, list_mot_stopwords
+
 
 def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str, stemming: int) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de backbofwords selon le choix de l'utilisateur.

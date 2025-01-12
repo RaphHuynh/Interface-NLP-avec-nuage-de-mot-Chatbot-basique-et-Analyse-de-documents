@@ -1,7 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
-from lib.utils import descriptor_select_distance
+from lib.utils import descriptor_select_distance, stopwords
 from itertools import chain
 
 app_ui = ui.page_fluid(
@@ -66,7 +66,7 @@ app_ui = ui.page_fluid(
                     selected="Euclidienne"
                 ),
                 ui.p("Stopwords", class_="mt-4"),
-                ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"Aucun"}, selected="5"),
+                ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"english short", "6": "Aucun"}, selected="6"),
                 ui.p("Stemming & Lemmatisation", class_="mt-4"),
                 ui.input_select("stemming", "", choices={"1": "Porter Stemmer", "2": "Snowball Stemmer", "3":"Lancaster Stemmer", "4":"wordNet Lemmatiser", "5":"Lovins Stemmer", "6":"Aucun"}, selected="6"),
                 ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
@@ -89,7 +89,7 @@ app_ui = ui.page_fluid(
 # Mise à jour de la fonction de rendu pour inclure le graphe
 def server(input, output, session):
     lang = reactive.Value("Français")
-    stopwords = reactive.Value("Aucun")
+    stopword = reactive.Value("Aucun")
     stemming = reactive.Value("Aucun")
     phrases = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
@@ -104,7 +104,7 @@ def server(input, output, session):
     @reactive.Effect
     @reactive.event(input.stopwords)
     def update_stopwords():
-        stopwords.set(input.stopwords())
+        stopword.set(input.stopwords())
         
     @reactive.Effect
     @reactive.event(input.stemming)
@@ -159,7 +159,7 @@ def server(input, output, session):
     @render.ui
     def content():
         selected_lang = lang.get()
-        selected_stopwords = stopwords.get()
+        selected_stopwords = stopword.get()
         selected_stemming = stemming.get()
         
         if not input.file_input():
@@ -222,8 +222,8 @@ def server(input, output, session):
             else:
                 liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
             
-        if selected_stopwords != "5":
-            corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_lang)
+        if selected_stopwords != "6":
+            corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_stopwords)
         else:
             corpus_sans_poc_stopword = corpus_sans_poc
             liste_mots_stopword = liste_mots
