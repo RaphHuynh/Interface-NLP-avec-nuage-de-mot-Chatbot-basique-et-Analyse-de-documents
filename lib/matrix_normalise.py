@@ -2,7 +2,7 @@ import math
 from .descripteur.backofword_occurence import backbofwords_occurence
 from typing import List
 
-def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: List[str]) -> List[List[float]]:
+def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: List[str], stemming) -> List[List[float]]:
     """ Calcule la matrice de backbofwords normalisée par probabilité
     
     Args:
@@ -12,7 +12,7 @@ def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: 
     Returns:
         List[List[float]]: matrice de backbofwords normalisée par probabilité
     """
-    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
+    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots, stemming)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
 
     for i in range(len(matrix)):
@@ -26,7 +26,7 @@ def matrix_backbofwords_normalize_proba(corpus_sans_poc: List[str], liste_mots: 
     return matrix_normalize
 
 
-def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: List[str]) -> List[List[float]]:
+def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: List[str], stemming) -> List[List[float]]:
     """ Calcule la matrice de backbofwords normalisée par norme
     
     Args:
@@ -36,7 +36,7 @@ def matrix_backbofwords_normalize_Norme(corpus_sans_poc: List[str], liste_mots: 
     Returns:
         List[List[float]]: matrice de backbofwords normalisée par norme
     """
-    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots)
+    matrix = backbofwords_occurence(corpus_sans_poc, liste_mots, stemming)
     matrix_normalize = [[0 for _ in matrix[0]] for _ in matrix]
 
     for i in range(len(matrix)):
