@@ -1,5 +1,6 @@
 import math
 from typing import List
+from lib.descripteur.utils import appliquer_stemming
 
 def tf_idf_new(corpus: List[str],list_mot: List[str], stemming: int) -> List[List[float]]:
     """ Calcule la matrice TF-IDF pour un corpus donné.
@@ -23,7 +24,7 @@ def tf_idf_new(corpus: List[str],list_mot: List[str], stemming: int) -> List[Lis
     # Calculer la matrice TF-IDF
     for i in range(len(corpus)):
         # Découper le document en mots
-        mots_document = corpus[i].split()
+        mots_document = appliquer_stemming(corpus[i], stemming)
         longueur_document = len(mots_document)
 
         for j, mot in enumerate(list_mot):
