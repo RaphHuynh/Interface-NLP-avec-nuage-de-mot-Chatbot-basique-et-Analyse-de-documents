@@ -148,7 +148,7 @@ def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: str) -> Tu
     return corpus_stopwords, list_mot_stopwords
 
 
-def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str, stemming: int) -> List[List[float]]:
+def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: str, stemming: str, stopword: str) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de backbofwords selon le choix de l'utilisateur.
 
     Args:
@@ -160,7 +160,7 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
         List[List[float]]: matrice du descripteur (backbofwords)
     """
     if choix1 == "1":
-        return backbofwordsBinaire(corpus_sans_poc, liste_mots, stemming)
+        return backbofwordsBinaire(corpus_sans_poc, liste_mots, stemming, stopword)
     elif choix1 == "2":
         return backbofwords_occurence(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "3":

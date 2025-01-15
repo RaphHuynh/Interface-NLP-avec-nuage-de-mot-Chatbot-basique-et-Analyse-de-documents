@@ -1,6 +1,7 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
+from lib.utils import *
 
 app_ui = ui.page_fluid(
     ui.div(
@@ -106,16 +107,40 @@ def server(input, output, session):
         wc_mask = nuage_mots_couleur_masque(" ".join(corpus_stopword), lang.get())
         
         return ui.div(
-            ui.h3('Nuage de mot'),
-            ui.p('Nuage de mot avec couleur et sans stopword'),
-            ui.img(src=wc_color),
-            ui.p('Nuage de mot sans couleur et sans stopword'),
-            ui.img(src=wc),
-            ui.p('Nuage de mot avec couleur et avec stopword'),
-            ui.img(src=wc_color_stopword),
-            ui.p('Nuage de mot avec couleur, stopword et mask du pays'),
-            ui.img(src=wc_mask)
-        )
+    ui.div(
+        ui.div(
+            ui.h3('Nuages de mots'),
+            class_='text-center mb-4 font-weight-bold'
+        ),
+        ui.div(
+            ui.div(
+                ui.div(ui.p('Nuage de mot avec couleur et sans stopword', class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc_color, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            ui.div(
+                ui.div(ui.p('Nuage de mot sans couleur et sans stopword', class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            class_='row mb-4'
+        ),
+        ui.div(
+            ui.div(
+                ui.div(ui.p('Nuage de mot avec couleur et avec stopword', class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc_color_stopword, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            ui.div(
+                ui.div(ui.p('Nuage de mot avec couleur, stopword et mask du pays', class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc_mask, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            class_='row'
+        ),
+        class_='container'
+    )
+)
 
     @reactive.Effect
     @reactive.event(input.lang_select)
@@ -208,7 +233,7 @@ def server(input, output, session):
             corpus = separer_phrase(contenu)
             corpus_sans_poc = supp_poc_corpus(corpus)
             phrases.set(corpus_sans_poc)
-
+            
         liste_mots = give_liste_mot(corpus_sans_poc, selected_stemming)
             
         if selected_stopwords != "6":
@@ -217,7 +242,7 @@ def server(input, output, session):
             corpus_sans_poc_stopword = corpus_sans_poc
             liste_mots_stopword = liste_mots
 
-        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming)
+        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming, selected_stopwords)
         distance = input.choix2()
         distance_matrix = get_distance_matrix(list_backbofwords, distance)
 

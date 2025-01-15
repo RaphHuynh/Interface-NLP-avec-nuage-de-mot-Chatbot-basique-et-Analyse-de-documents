@@ -15,7 +15,7 @@ def porter_stemmer(list_words):
 def porter_stemmer_phrase(phrase):
     stemmer = PorterStemmer()
     words = word_tokenize(phrase)
-    return [stemmer.stem(word) for word in words if word.isalpha()]
+    return [stemmer.stem(word) for word in words if word.isalnum()]
 
 def lancaster_stemmer(list_words):
     stemmer = LancasterStemmer()

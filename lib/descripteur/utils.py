@@ -1,6 +1,11 @@
 # Fonction de stemming en fonction de l'option
 from typing import List
 from lib.spacy_nltk.stemming import *
+import os
+import nltk
+from nltk.corpus import stopwords as nltk_stopwords
+
+nltk.download('stopwords')
 
 
 def appliquer_stemming(phrase: str, stemming: str) -> List[str]:
