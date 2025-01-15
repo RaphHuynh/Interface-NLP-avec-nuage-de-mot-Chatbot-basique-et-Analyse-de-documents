@@ -99,7 +99,6 @@ def server(input, output, session):
         else:
             corpus_stopword = corpus_sans_poc
             corpus_sans_poc_stopword = corpus_sans_poc
-            liste_mots_stopword = liste_mots
             
         wc_color = nuage_mots_couleur(" ".join(corpus_sans_poc_stopword))
         wc = nuage_mots(" ".join(corpus_sans_poc_stopword),)
@@ -169,7 +168,7 @@ def server(input, output, session):
     def phrase_selector():
         if not phrases.get():
             return None
-        return ui.input_select("phrase_select", "Choisissez une phrase", choices={str(i): p for i, p in enumerate(phrases.get())}, selected=selected_phrase_index_str.get())
+        return ui.input_select("phrase_select", "Choisissez une phrase", choices={str(i): p for i, p in enumerate(phrases.get())}, selected=selected_phrase_index_str.get())  
 
     @reactive.Effect
     @reactive.event(input.file_input)
@@ -252,10 +251,6 @@ def server(input, output, session):
 
         # Générer le graphe des k plus proches voisins
         graph_image.set(plot_knn_graph(k_max, distance_matrix, corpus_sans_poc, selected_phrase_index.get()))
-
-        # Affiche les matrices de manière permanente
-        backofword_df = pd.DataFrame(list_backbofwords)
-        distance_df = pd.DataFrame(distance_matrix)
         
         word_frequency = calculate_word_frequency(corpus_sans_poc_stopword)
         word_frequency_df = pd.DataFrame(word_frequency.items(), columns=['Mot', 'Fréquence'])
