@@ -18,3 +18,5 @@ from .k_plus_proches_documents import *
 from .utils import *
 from .models import *
 from .spacy_nltk import *
+from .interface import *
+from .nuage_mots import *

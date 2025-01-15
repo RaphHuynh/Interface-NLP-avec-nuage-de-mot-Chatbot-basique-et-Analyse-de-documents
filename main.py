@@ -1,88 +1,49 @@
 from shiny import App, ui, render, reactive
 import pandas as pd
 from lib import *
-from lib.utils import descriptor_select_distance, stopwords
-from itertools import chain
 
 app_ui = ui.page_fluid(
-    ui.tags.head(
-        ui.tags.link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"),
-        ui.tags.script(src="https://code.jquery.com/jquery-3.6.0.min.js"),
-        ui.tags.style("""
-            html { margin: 0; padding: 0; }
-            main { margin: 0; padding: 0; }
-            body { margin: 0; padding: 0; background-color: #ffffff; font-family: 'Arial', sans-serif; }
-            .main-content { height: 100vh; overflow-y: auto; }
-            .table-auto {
-                border-collapse: collapse;
-                width: 100%;
-            }
-            .table-auto th, .table-auto td {
-                border: 1px solid #ddd;
-                padding: 8px;
-            }
-            .table-auto th {
-                background-color: #f2f2f2;
-                text-align: left;
-            }
-            
-        """),
-        ui.tags.script("""
-            $(document).on('click', '#showBackofword', function() {
-                $('#backofwordModal').show();
-            });
-            
-            $(document).on('click', '#showDistance', function() {
-                $('#distanceModal').show();
-            });
-            
-            $(document).on('click', '.close-modal', function() {
-                $(this).closest('.modal').hide();
-            });
-            
-            $(document).on('click', '.modal', function(event) {
-                if (event.target === this) {
-                    $(this).hide();
-                }
-            });
-        """)
-    ),
     ui.div(
         # Sidebar
         ui.div(
             ui.div(
-                ui.h2("Menu", class_="text-2xl text-center font-bold mb-4 border-b border-gray-300 pb-3"),
-                ui.input_select("lang_select", "", choices={"Français": "🇫🇷 Français", "English": "🏴󠁧󠁢󠁥󠁮󠁧󠁿 English"}, selected="Français"),
-                ui.p("Descripteur", class_="mt-4"),
+                ui.h2("Menu", class_="h3 text-center font-weight-bold mb-4 border-bottom pb-3"),
+                ui.input_select("lang_select", "", choices={"Français": "🇫🇷 Français", "English": "🏴 English"}, selected="Français"),
+                ui.p("Descripteur", class_="mt-2"),
                 ui.input_select(
                     "choix1", "", 
                     choices={"1": "Binaire", "2": "Occurence", "3": "Probalite", "4":"Normalise","5":"tf_idf_bin","6":"tf_idf_occ","7":"tf_idf_norm","8":"tf_idf_new"}, 
                     selected="1"  
                 ),
-                ui.p("Distance", class_="mt-4"),
+                ui.p("Distance", class_="mt-2"),
                 ui.input_select(
                     "choix2", "", 
                     choices=descriptor_select_distance("1"),
                     selected="Euclidienne"
                 ),
-                ui.p("Stopwords", class_="mt-4"),
+                ui.p("Stopwords", class_="mt-2"),
                 ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"english short", "6": "Aucun"}, selected="6"),
-                ui.p("Stemming & Lemmatisation", class_="mt-4"),
+                ui.p("Stemming & Lemmatisation", class_="mt-2"),
                 ui.input_select("stemming", "", choices={"1": "Porter Stemmer", "2": "Snowball Stemmer", "3":"Lancaster Stemmer", "4":"wordNet Lemmatiser", "5":"Lovins Stemmer", "6":"Aucun"}, selected="6"),
                 ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
                 ui.output_ui("phrase_selector"),
                 ui.input_slider("k_value", "Nombre de voisins les plus proches (k)", min=1, max=10, value=3, step=1),
-                ui.input_action_button("generate", "Generate", class_="mt-4 w-full bg-black text-white py-2 px-4 rounded"),
-                class_="p-4 border border-gray-200 shadow-md bg-gray-50 rounded-lg",
+                ui.input_action_button("generate", "Generate", class_="mt-4 w-100 btn btn-dark"),
+                class_="p-4 shadow-sm bg-light rounded",
             ),
-            class_="w-1/5 sidebar mt-4",
+            class_="sidebar mt-4 position-fixed",
         ),
         # Main content
         ui.div(
-            ui.output_ui("content"),
-            class_="w-4/5 p-8 main-content"
+            ui.navset_card_tab(
+                ui.nav_panel("Analyse de texte", ui.output_ui("content")),
+                ui.nav_panel("Nuage de point", ui.output_ui("embedding_call")),
+                ui.nav_panel("Chatbot", ui.output_ui("chatbot")),
+                id="selected_navset_card_tab",
+            ),
+            class_="col-md-9 p-4 main-content position-absolute end-0 top-0",
         ),
-        class_="flex"
+        class_="d-flex"
     ),
 )
 
@@ -95,6 +56,66 @@ def server(input, output, session):
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
     graph_image = reactive.Value("")
+    
+    @output
+    @render.ui
+    def chatbot():
+        return ui.div(
+            ui.h1('Chatbot'),
+            ui.p('This is a chatbot page.')
+        )
+       
+    @output 
+    @render.ui
+    def embedding_call():
+        corpus = input.file_input()
+        if not corpus:
+            return ui.p("Veuillez sélectionner un fichier." if lang.get() == "Français" else "Please select a file.")
+        
+        if len(corpus) > 1:
+            object_corpus = Corpus()
+            for file in corpus:
+                with open(file['datapath'], 'r', encoding='utf-8') as f:
+                    text = f.read()
+                    object_corpus.add_document(text)
+            corpus = object_corpus.list_documents
+            corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
+            phrases.set(corpus_sans_poc)
+        else:
+            corpus = corpus[0]
+            with open(corpus['datapath'], 'r', encoding='utf-8') as f:
+                contenu = f.read()
+
+            corpus = separer_phrase(contenu)
+            corpus_sans_poc = supp_poc_corpus(corpus)
+            phrases.set(corpus_sans_poc)
+            
+        liste_mots = give_liste_mot(corpus_sans_poc, stemming.get())
+        
+        if stopword.get() != "6":
+            corpus_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, stopword.get())
+            corpus_sans_poc_stopword = corpus_sans_poc
+        else:
+            corpus_stopword = corpus_sans_poc
+            corpus_sans_poc_stopword = corpus_sans_poc
+            liste_mots_stopword = liste_mots
+            
+        wc_color = nuage_mots_couleur(" ".join(corpus_sans_poc_stopword))
+        wc = nuage_mots(" ".join(corpus_sans_poc_stopword),)
+        wc_color_stopword = nuage_mots_couleur_stopword(" ".join(corpus_stopword))
+        wc_mask = nuage_mots_couleur_masque(" ".join(corpus_stopword), lang.get())
+        
+        return ui.div(
+            ui.h3('Nuage de mot'),
+            ui.p('Nuage de mot avec couleur et sans stopword'),
+            ui.img(src=wc_color),
+            ui.p('Nuage de mot sans couleur et sans stopword'),
+            ui.img(src=wc),
+            ui.p('Nuage de mot avec couleur et avec stopword'),
+            ui.img(src=wc_color_stopword),
+            ui.p('Nuage de mot avec couleur, stopword et mask du pays'),
+            ui.img(src=wc_mask)
+        )
 
     @reactive.Effect
     @reactive.event(input.lang_select)
@@ -179,23 +200,6 @@ def server(input, output, session):
             corpus = object_corpus.list_documents
             corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
             phrases.set(corpus_sans_poc)
-            
-            if selected_stemming == "1":
-                liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "2":
-                liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "3":
-                liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "4":
-                liste_mots = [wordnet_lemmatizer(phrase.lower()) for phrase in corpus_sans_poc]
-                flat_list = list(chain.from_iterable(liste_mots))
-                liste_mots = retirer_doublons(flat_list)
-            elif selected_stemming == "5":
-                liste_mots = [lovins_stemmer(phrase.lower()) for phrase in corpus_sans_poc]
-                flat_list = list(chain.from_iterable(liste_mots))
-                liste_mots = retirer_doublons(flat_list)
-            else:
-                liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
         else:
             uploaded_file = input.file_input()[0]
             with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
@@ -205,22 +209,7 @@ def server(input, output, session):
             corpus_sans_poc = supp_poc_corpus(corpus)
             phrases.set(corpus_sans_poc)
 
-            if selected_stemming == "1":
-                liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "2":
-                liste_mots = snowball_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "3":
-                liste_mots = lancaster_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
-            elif selected_stemming == "4":
-                liste_mots = [wordnet_lemmatizer(phrase.lower()) for phrase in corpus_sans_poc] 
-                flat_list = list(chain.from_iterable(liste_mots))
-                liste_mots = retirer_doublons(flat_list)
-            elif selected_stemming == "5":
-                liste_mots = [lovins_stemmer(phrase.lower()) for phrase in corpus_sans_poc]
-                flat_list = list(chain.from_iterable(liste_mots))
-                liste_mots = retirer_doublons(flat_list)
-            else:
-                liste_mots = retirer_doublons(split_doc_mot(corpus_sans_poc))
+        liste_mots = give_liste_mot(corpus_sans_poc, selected_stemming)
             
         if selected_stopwords != "6":
             corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_stopwords)
@@ -257,76 +246,57 @@ def server(input, output, session):
         words_boxplot = plot_number_of_words_boxplot(corpus_sans_poc)        
 
         return ui.div(
-            ui.h3("Résultats de l'analyse", class_="text-2xl font-bold mb-4 text-center"),
+            ui.h3("Résultats de l'analyse", class_="h3 font-weight-bold mb-4 text-center"),
             ui.div(
-                ui.h4("Phrase sélectionnée :", class_="text-lg font-semibold mb-2"),
+                ui.p("Phrase sélectionnée :", class_="font-weight-semibold mb-2"),
                 ui.p(corpus[selected_phrase_index.get()] if selected_phrase_index.get() is not None else "Aucune phrase sélectionnée."),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
             ),
             ui.div(
-                ui.h4("Phrases les plus proches", class_="text-lg font-semibold mb-2"),
+                ui.p("Phrases les plus proches", class_="font-weight-semibold mb-2"),
                 ui.HTML("<br>".join(k_nearest_phrases)),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
-            ),
-            ui.div(
-                ui.div(
-                    ui.h4("Matrice Backofword", class_="text-lg font-semibold mb-2 text-center"),
-                    ui.div(
-                        ui.HTML(style_dataframe(backofword_df).to_html()),
-                        class_="overflow-x-auto max-h-96 mb-2"
-                    ),
-                    class_="w-1/2 bg-gray-50 p-4 rounded-lg border-2 shadow-md"
-                ),
-                ui.div(
-                    ui.h4("Matrice de Distance", class_="text-lg font-semibold mb-2 text-center"),
-                    ui.div(
-                        ui.HTML(style_dataframe(distance_df).to_html()),
-                        class_="overflow-x-auto max-h-96 mb-2"
-                    ),
-                    class_="w-1/2 bg-gray-50 p-4 rounded-lg border-2 shadow-md"
-                ),
-                class_="flex gap-2 mb-4"
+                class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
             ),
             # Afficher le graphique dans l'application
             ui.div(
-                ui.h4("Graphique des K plus proches voisins", class_="text-lg font-semibold mb-2 text-center"),
+                ui.h4("Graphique des K plus proches voisins", class_="h4 font-weight-semibold mb-2 text-center"),
                 ui.div(
-                    ui.p("Le graphe des k plus proches voisins représente les distances entre les différentes phrases du corpus. Il permet de visualiser les relations entre les phrases en utilisant une mesure de distance spécifique choisi dans le menu. Cela signifie que plus les phrases sont proches du point central plus elles sont similaires à cette phrase. Chaque phrase est représentée par un point dans l'espace vectoriel. Le nombre représente l'index de la phrase dans le corpus."),
-                    ui.img(src=graph_image.get(), class_="w-full max-w-3xl mx-auto"),
-                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                    ui.p("Le graphe des k plus proches voisins représente les distances entre les différentes phrases du corpus. Il permet de visualiser les relations entre les phrases en utilisant une mesure de distance spécifique choisie dans le menu. Cela signifie que plus les phrases sont proches du point central plus elles sont similaires à cette phrase. Chaque phrase est représentée par un point dans l'espace vectoriel. Le nombre représente l'index de la phrase dans le corpus.", class_="text-secondary text-justify fs-6"),
+                    ui.img(src=graph_image.get(), class_="img-fluid col-md-6 mx-auto"),
+                    class_="d-flex gap-2 text-secondary text-justify pr-2 align-items-center",
                 ),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md",
+                class_="bg-light p-4 rounded mb-4 border-2 shadow-sm",
             ),
             ui.div(
                 ui.div(
-                    ui.h4("Graphique des Fréquences des Mots", class_="text-lg font-semibold mb-2 text-center"),
-                    ui.img(src=word_freq_graph, class_="w-full max-w-3xl mx-auto"),
-                    class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                    ui.h4("Graphique des Fréquences des Mots", class_="h4 font-weight-semibold mb-2 text-center"),
+                    ui.img(src=word_freq_graph, class_="img-fluid mx-auto"),
+                    class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
                 ),
                 ui.div(
-                    ui.h4("Répartition des Mots les plus Fréquents", class_="text-lg font-semibold mb-2 text-center"),
-                    ui.img(src=word_freq_graph_pie_chart, class_="w-full max-w-3xl mx-auto"),
-                    class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                    ui.h4("Répartition des Mots les plus Fréquents", class_="h4 font-weight-semibold mb-2 text-center"),
+                    ui.img(src=word_freq_graph_pie_chart, class_="img-fluid mx-auto"),
+                    class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
                 ),
-                class_="flex gap-2" 
+                class_="d-flex gap-2"
             ),
             ui.div(
-                ui.h4("Boxplot des Distances", class_="text-lg font-semibold mb-2 text-center"),
+                ui.h4("Boxplot des Distances", class_="h4 font-weight-semibold mb-2 text-center"),
                 ui.div(
-                    ui.img(src=distance_boxplot, class_="w-full max-w-3xl mx-auto"),
+                    ui.img(src=distance_boxplot, class_="img-fluid col-md-6 mx-auto"),
                     ui.p("Le boxplot des distances (entre phrases) représente la distribution des distances entre les différentes paires de phrases dans un espace vectoriel. Il permet de visualiser la similarité entre les phrases en utilisant une mesure de distance spécifique. Cela signifie que plus les phrases sont proches de 0 plus elles sont similaires."),
-                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                    class_="d-flex gap-2 text-secondary text-justify pr-2 align-items-center",
                 ),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
-                ),
+                class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
+            ),
             ui.div(
-                ui.h4("Boxplot des fréquences des mots par phrase", class_="text-lg font-semibold mb-2 text-center"),
+                ui.h4("Boxplot des fréquences des mots par phrase", class_="h4 font-weight-semibold mb-2 text-center"),
                 ui.div(
                     ui.p("Le boxplot des fréquences des mots par phrase représente la distribution des fréquences des mots dans chaque phrase. Il permet de visualiser la variabilité des fréquences des mots dans les phrases du corpus. On peut donc observer si les phrases sont plus ou moins homogènes, courtes ou longues. Dans le cadre où il y a plusieurs documents, le boxplot représente la distribution des fréquences des mots dans chaque document."),
-                    ui.img(src=words_boxplot, class_="w-full max-w-3xl mx-auto"),
-                    class_="flex gap-2 text-gray-600 text-justify pr-2 items-center",
+                    ui.img(src=words_boxplot, class_="img-fluid col-md-6 mx-auto"),
+                    class_="d-flex gap-2 text-secondary text-justify pr-2 align-items-center",
                 ),
-                class_="bg-gray-50 p-4 rounded-lg mb-4 border-2 shadow-md"
+                class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
             ),
         )
 
