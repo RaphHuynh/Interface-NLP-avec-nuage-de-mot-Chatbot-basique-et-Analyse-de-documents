@@ -20,3 +20,4 @@ from .models import *
 from .spacy_nltk import *
 from .interface import *
 from .nuage_mots import *
+from .chatbot import *

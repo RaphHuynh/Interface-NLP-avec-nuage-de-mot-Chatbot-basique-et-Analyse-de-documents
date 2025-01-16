@@ -3,7 +3,7 @@ from typing import List
 from lib.descripteur.utils import appliquer_stemming
 from lib.spacy_nltk.stemming import *
 
-def backbofwordsBinaire(list_phrase: List[str], list_mot: List[str], stemming: str, stopword: str) -> List[List[int]]:
+def backbofwordsBinaire(list_phrase: List[str], list_mot: List[str], stemming: str) -> List[List[int]]:
     """ bag of words binaire
 
     Args:

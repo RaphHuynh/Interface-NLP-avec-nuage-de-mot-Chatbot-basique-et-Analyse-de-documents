@@ -32,7 +32,7 @@ app_ui = ui.page_fluid(
                 ui.input_action_button("generate", "Generate", class_="mt-4 w-100 btn btn-dark"),
                 class_="p-4 shadow-sm bg-light rounded",
             ),
-            class_="sidebar mt-4 position-fixed",
+            class_="mt-2 position-fixed",
         ),
         # Main content
         ui.div(
@@ -54,17 +54,10 @@ def server(input, output, session):
     stopword = reactive.Value("Aucun")
     stemming = reactive.Value("Aucun")
     phrases = reactive.Value([])
+    corpus_ponc = reactive.Value([])
     selected_phrase_index = reactive.Value(None)
     selected_phrase_index_str = reactive.Value("0")
     graph_image = reactive.Value("")
-    
-    @output
-    @render.ui
-    def chatbot():
-        return ui.div(
-            ui.h1('Chatbot'),
-            ui.p('This is a chatbot page.')
-        )
        
     @output 
     @render.ui
@@ -241,7 +234,7 @@ def server(input, output, session):
             corpus_sans_poc_stopword = corpus_sans_poc
             liste_mots_stopword = liste_mots
 
-        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming, selected_stopwords)
+        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming)
         distance = input.choix2()
         distance_matrix = get_distance_matrix(list_backbofwords, distance)
 
@@ -319,6 +312,88 @@ def server(input, output, session):
                 class_="bg-light p-4 rounded mb-4 border-2 shadow-sm"
             ),
         )
+        
+    @output
+    @render.ui
+    def chatbot():
+        selected_lang = lang.get()
+        selected_stopwords = stopword.get()
+        selected_stemming = stemming.get()
+        
+        if not input.file_input():
+            return ui.p("Veuillez sélectionner un fichier." if selected_lang == "Français" else "Please select a file.")
+
+        if not input.generate():
+            return ui.p("Cliquez sur Generate pour voir les résultats." if selected_lang == "Français" else "Click Generate to see results.")
+        
+        uploaded_file = input.file_input()
+        
+        if len(uploaded_file) > 1:
+            object_corpus = Corpus()
+            for file in uploaded_file:
+                with open(file['datapath'], 'r', encoding='utf-8') as f:
+                    text = f.read()
+                    object_corpus.add_document(text)
+            corpus = object_corpus.list_documents
+            corpus_sans_poc = [retirer_ponctuation(c) for c in object_corpus.list_documents if c]
+            phrases.set(corpus_sans_poc)
+            corpus_ponc.set(corpus)
+        else:
+            uploaded_file = input.file_input()[0]
+            with open(uploaded_file['datapath'], 'r', encoding='utf-8') as f:
+                contenu = f.read()
+
+            corpus = separer_phrase(contenu)
+            corpus_sans_poc = supp_poc_corpus(corpus)
+            phrases.set(corpus_sans_poc)
+            
+        liste_mots = give_liste_mot(corpus_sans_poc, selected_stemming)
+            
+        if selected_stopwords != "6":
+            corpus_sans_poc_stopword, liste_mots_stopword = stopwords(corpus_sans_poc, liste_mots, selected_stopwords)
+        else:
+            corpus_sans_poc_stopword = corpus_sans_poc
+            liste_mots_stopword = liste_mots
+
+        list_backbofwords = get_backbofwords(corpus_sans_poc_stopword, liste_mots_stopword, input.choix1(), selected_stemming)
+        distance = input.choix2()
+        distance_matrix = get_distance_matrix(list_backbofwords, distance)
+
+        k = input.k_value()
+        k_nearest_phrases = get_k_nearest_phrases(corpus, selected_phrase_index.get(), k, distance_matrix)
+        k_max = len(corpus_sans_poc_stopword) - 1
+        
+        return ui.div(
+            ui.h3("Chatbot", class_="h3 font-weight-bold mb-4 text-center"),
+            ui.div(
+                ui.output_text("reponse"),
+                class_="bg-success p-3 text-white rounded",
+                style="--bs-bg-opacity: .7;"
+            ),
+            ui.div(
+                ui.input_text("question", "Posez une question...",),
+                class_="w-full"
+            )
+        )
+        
+    @output
+    @render.text
+    def reponse():
+        question = input.question()
+        if not question:
+            return "Veuillez poser une question." if lang.get() == "Français" else "Please ask a question."
+        
+        if input.file_input() and len(input.file_input()) > 1:
+            corpus = phrases.get()
+            corpus_p = corpus_ponc.get()
+            corpus_p = " ".join(corpus_p)
+        else:
+            corpus = phrases.get()
+            corpus_p = phrases.get()
+            corpus_p = ".".join(corpus_p)
+
+        reponse_text = repondre_a_question(question, corpus_p, corpus)
+        return reponse_text
 
 app = App(app_ui, server)  
 
