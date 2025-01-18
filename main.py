@@ -97,6 +97,8 @@ def server(input, output, session):
         wc = nuage_mots(" ".join(corpus_sans_poc_stopword),)
         wc_color_stopword = nuage_mots_couleur_stopword(" ".join(corpus_stopword))
         wc_mask = nuage_mots_couleur_masque(" ".join(corpus_stopword), lang.get())
+        wc_stopword_cloud = nuage_mots_stopword_wordcloud(" ".join(corpus_stopword))
+        wc_tfidf = nuage_mots_tfidf(" ".join(corpus_stopword), lang.get())
         
         return ui.div(
     ui.div(
@@ -129,6 +131,19 @@ def server(input, output, session):
                 class_='col-md-6'
             ),
             class_='row'
+        ),
+        ui.div(
+            ui.div(
+                ui.div(ui.p('Nuage de mot avec stopword de cloudword', class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc_stopword_cloud, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            ui.div(
+                ui.div(ui.p("Nuage de mot avec tfidf - stopword de sklearn pour l'anglais et nltk pour le français", class_='text-center'), class_='mb-2'),
+                ui.div(ui.img(src=wc_tfidf, class_='img-fluid'), class_='text-center'),
+                class_='col-md-6'
+            ),
+            class_='row'  
         ),
         class_='container'
     )
