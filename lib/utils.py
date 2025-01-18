@@ -16,6 +16,8 @@ from .descripteur import *
 from .distance import *
 import nltk
 from nltk.corpus import stopwords as nltk_stopwords
+import spacy
+from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS
 
 nltk.download('stopwords')
 
@@ -124,6 +126,14 @@ def stopwords(corpus: List[str], list_mot: List[str], nom_stop_words: str) -> Tu
         mots_vides = set(nltk_stopwords.words('french'))
     elif nom_stop_words == "4":
         mots_vides = set(nltk_stopwords.words('english'))
+    elif nom_stop_words == "6":
+        nlp = spacy.load("fr_core_news_sm")
+        mots_vides = set(nlp.Defaults.stop_words)
+    elif nom_stop_words == "7":
+        nlp = spacy.load("en_core_web_sm")
+        mots_vides = set(nlp.Defaults.stop_words)
+    elif nom_stop_words == "8":
+        mots_vides = set(ENGLISH_STOP_WORDS)
 
     # Si des fichiers sont spécifiés, les charger
     if nom_stop_words in ["1", "2", "5"]:

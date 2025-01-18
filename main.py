@@ -23,7 +23,7 @@ app_ui = ui.page_fluid(
                     selected="Euclidienne"
                 ),
                 ui.p("Stopwords", class_="mt-2"),
-                ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"english short", "6": "Aucun"}, selected="6"),
+                ui.input_select("stopwords", "", choices={"1": "Stopword Français", "2": "Stopwords English", "3":"Stopwords nltk français", "4":"Stopwords nltk english", "5":"english short", "6": "Stopwords spacy fr", "7": "Stopwords spacy english", "8":"Stopword sklearn englis", "9": "Aucun"}, selected="6"),
                 ui.p("Stemming & Lemmatisation", class_="mt-2"),
                 ui.input_select("stemming", "", choices={"1": "Porter Stemmer", "2": "Snowball Stemmer", "3":"Lancaster Stemmer", "4":"wordNet Lemmatiser", "5":"Lovins Stemmer", "6":"Aucun"}, selected="6"),
                 ui.input_file("file_input", "Déposer un fichier ici ou cliquer pour sélectionner un fichier", multiple=True),
