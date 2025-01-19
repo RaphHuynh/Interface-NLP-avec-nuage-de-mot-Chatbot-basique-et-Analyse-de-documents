@@ -9,6 +9,17 @@ nltk.download('stopwords')
 
 
 def appliquer_stemming(phrase: str, stemming: str) -> List[str]:
+    """
+    Appliquer le stemming à une phrase en fonction de l'option choisie.
+    
+    Args:
+        phrase (str): La phrase à traiter.
+        stemming (str): L'option pour choisir le stemming.
+        
+    Returns:
+        List[str]: La liste des mots après application du stemming.
+    
+    """
     phrase = phrase.lower()
 
     if stemming == "1":

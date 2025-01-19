@@ -10,7 +10,7 @@ def calculer_vecteurs_doc2vec(corpus: List[str], list_mot: List[str], stemming: 
 
     Args:
         corpus (List[str]): Le corpus de documents.
-        list_mot (List[str]): La liste des mots (vocabulaire prédéfini).
+        ist_mot (List[str]): Liste des mots du corpus.
         stemming (str): Option pour choisir le stemming.
 
     Returns:

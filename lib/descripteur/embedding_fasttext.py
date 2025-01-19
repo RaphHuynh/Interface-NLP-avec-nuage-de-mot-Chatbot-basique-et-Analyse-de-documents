@@ -9,6 +9,7 @@ def calculer_vecteurs_fasttext(corpus: List[str], list_mot: List[str], stemming:
     
     Args:
         corpus (List[str]): Le corpus de documents.
+        list_mot (List[str]): Liste des mots du corpus.
         stemming (str): Option pour choisir le stemming.
 
     Returns:

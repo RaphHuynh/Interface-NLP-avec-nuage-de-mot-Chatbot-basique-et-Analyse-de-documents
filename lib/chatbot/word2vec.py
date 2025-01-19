@@ -1,6 +1,7 @@
 import re
 import gensim
 import numpy as np
+from typing import List
 
 from gensim.models import Word2Vec
 
@@ -15,7 +16,16 @@ formules_politesse = {
     "quel est": "Voici la réponse : ",
 }
 
-def modele_word2vec(corpus):
+def modele_word2vec(corpus: List[List[str]]) -> Word2Vec:
+    """
+    Créer un modèle Word2Vec à partir d'un corpus de documents tokenizés.
+    
+    Args:
+        corpus (List[List[str]]): Une liste de documents tokenizés.
+        
+    Returns:
+        Word2Vec: Un modèle Word2Vec entraîné sur le corpus.
+    """
     modele1 = Word2Vec(vector_size=2, window=5, min_count=1)
    
     modele1.build_vocab(corpus)
@@ -24,7 +34,19 @@ def modele_word2vec(corpus):
     
     return modele1
    
-def mot_significatif(question, corpus, modele):
+def mot_significatif(question: str, corpus: List[List[str]], modele: Word2Vec) -> str:
+    """
+    retourne le mot le plus significatif dans la question en utilisant Word2Vec.
+    
+    Args:
+        question (str): La question posée par l'utilisateur.
+        corpus (List[List[str]]): Une liste de documents tokenizés.
+        modele (Word2Vec): Un modèle Word2Vec entraîné sur le corpus.
+        
+    Returns:
+        str: Le mot le plus significatif dans la question.
+    
+    """
     mots_question = question.split()
     significances = {}
     
@@ -37,8 +59,17 @@ def mot_significatif(question, corpus, modele):
     # Retourner le mot avec la plus grande norme
     return max(significances, key=significances.get) if significances else None
 
-# Fonction pour récupérer la phrase contenant le mot
-def trouver_phrase(document, mot):
+def trouver_phrase(document: str, mot: str) -> str:
+    """
+    Trouver la phrase contenant le mot spécifié dans le document.
+    
+    Args:
+        document (str): Le document contenant des phrases.
+        mot (str): Le mot à rechercher dans le document.
+        
+    Returns:
+        str: La phrase contenant le mot spécifié.
+    """
     # Fractionner le texte en phrases
     phrases = re.split(r'[.!?]', document)
     
@@ -47,7 +78,18 @@ def trouver_phrase(document, mot):
             return phrase.strip()  # Retourner la phrase nettoyée
     return None
 
-def repondre_a_question(question, document, corpus):
+def repondre_a_question(question: str, document: str, corpus: List[List[str]]) -> str:
+    """
+    Répondre à une question en utilisant Word2Vec pour identifier le mot significatif.
+    
+    Args:
+        question (str): La question posée par l'utilisateur.
+        document (str): Le document contenant des phrases.
+        corpus (List[List[str]]): Une liste de documents tokenizés.
+        
+    Returns:
+        str: La réponse à la question posée.
+    """
     # Préparer le corpus pour Word2Vec
     corpus_tokens = [doc.split() for doc in corpus]
     modele = modele_word2vec(corpus_tokens)

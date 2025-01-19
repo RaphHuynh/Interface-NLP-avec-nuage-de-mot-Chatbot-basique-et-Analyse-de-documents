@@ -2,7 +2,18 @@ from lib.pretraitement import retirer_doublons, split_doc_mot
 from lib.spacy_nltk.stemming import *
 from itertools import chain
 
-def give_liste_mot(corpus_sans_poc, selected_stemming):
+def give_liste_mot(corpus_sans_poc: str, selected_stemming: str):
+    """
+    Appliquer le stemming à un texte en fonction de l'option choisie.
+    
+    Args:
+        corpus_sans_poc (str): La phrase à traiter.
+        selected_stemming (str): L'option pour choisir le stemming.
+        
+    Returns:
+        List[str]: La liste des mots après application du stemming.
+    
+    """
     if selected_stemming == "1":
         liste_mots = porter_stemmer(retirer_doublons(split_doc_mot(corpus_sans_poc)))
     elif selected_stemming == "2":
