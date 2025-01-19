@@ -32,7 +32,7 @@ app_ui = ui.page_fluid(
                 ui.input_action_button("generate", "Generate", class_="mt-4 w-100 btn btn-dark"),
                 class_="p-4 shadow-sm bg-light rounded",
             ),
-            class_="mt-2 position-fixed",
+            class_="mt-2",
         ),
         # Main content
         ui.div(
