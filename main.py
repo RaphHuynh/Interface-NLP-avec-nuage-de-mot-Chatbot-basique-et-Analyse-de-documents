@@ -381,14 +381,14 @@ def server(input, output, session):
         return ui.div(
             ui.h3("Chatbot", class_="h3 font-weight-bold mb-4 text-center"),
             ui.div(
-                ui.output_text("reponse"),
-                class_="bg-success p-3 text-white rounded",
-                style="--bs-bg-opacity: .7;"
-            ),
-            ui.div(
                 ui.input_text("question", "Posez une question...",),
                 class_="w-full"
-            )
+            ),
+            ui.div(
+                ui.output_text("reponse"),
+                class_="bg-primary p-3 text-white rounded",
+                style="--bs-bg-opacity: .5;"
+            ),
         )
         
     @output
