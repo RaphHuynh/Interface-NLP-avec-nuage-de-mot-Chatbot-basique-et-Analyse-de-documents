@@ -1,4 +1,4 @@
-# projet_nlp_info708
+# Interface NLP avec nuage de mot / Chatbot basique et Analyse de documents
 
 ## Comment faire fonctionner l'application ?
 - Installer les librairies avec la commande :
