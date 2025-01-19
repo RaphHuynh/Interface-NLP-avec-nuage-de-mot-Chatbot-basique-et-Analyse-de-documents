@@ -106,6 +106,8 @@ Il y a 6 nuages de mots générés différents
 
 ### Chatbot
 
+#### 1. Explication du fonctionnement
+
 - Le chatbot utilise Word2Vec
 
 - La fonction **modele_word2vec** génère un modèle Word2Vec à partir d'un corpus de documents tokenizés. Le vocabulaire du modèle est construit à partir du corpus.
@@ -123,3 +125,13 @@ Il y a 6 nuages de mots générés différents
   - La première phrase contenant le mot est retournée. Si aucune phrase ne correspond, la fonction retourne None.
 
 - La fonction repondre_a_question combine toutes les autres pour répondre à une question basée sur le document.
+
+#### 2. Pourquoi ce choix ?
+
+J'ai suivi cette logique pour réaliser le chatbot:
+- Détecter le mot de la question qui est le plus significatif
+- Repérer la première occurrence de ce mot dans le document pertinent et retourner comme réponse la phrase qui le contient. Une phrase est définie ici comme étant le texte entouré par deux ponctuations. 
+
+Word2Vec représente chaque mot comme un vecteur dans un espace où la distance entre vecteurs représente les similarités entre les mots.
+La norme d'un vecteur peut être utilisé comme une mesure de son importane dans l'espace.
+Les mots avec une forte norme vectorielle sont souvent ceux qui apparaissent fréquemment dans le corpus et qui ont une signification sémantique bien définie dans le modèle.

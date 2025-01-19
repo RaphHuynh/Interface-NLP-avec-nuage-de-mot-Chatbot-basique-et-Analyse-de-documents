@@ -78,7 +78,7 @@ def trouver_phrase(document: str, mot: str) -> str:
             return phrase.strip()  # Retourner la phrase nettoyée
     return None
 
-def repondre_a_question(question: str, document: str, corpus: List[List[str]]) -> str:
+def repondre_a_question(question: str, document: str, corpus: List[List[str]], stemmer: str) -> str:
     """
     Répondre à une question en utilisant Word2Vec pour identifier le mot significatif.
     
