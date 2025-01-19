@@ -20,10 +20,13 @@ cycler==0.12.1
 cymem==2.0.8
 decorator==5.1.1
 en_core_web_md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl#sha256=5e6329fe3fecedb1d1a02c3ea2172ee0fede6cea6e4aefb6a02d832dba78a310
+en_core_web_sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl#sha256=1932429db727d4bff3deed6b34cfc05df17794f4a52eeb26cf8928f7c1a0fb85
 exceptiongroup==1.2.2
 executing==2.1.0
 faicons==0.2.2
 fonttools==4.54.1
+fr_core_news_sm @ https://github.com/explosion/spacy-models/releases/download/fr_core_news_sm-3.8.0/fr_core_news_sm-3.8.0-py3-none-any.whl#sha256=7d6ad14cd5078e53147bfbf70fb9d433c6a3865b695fda2657140bbc59a27e29
+gensim==4.3.3
 h11==0.14.0
 htmltools==0.5.3
 idna==3.10
@@ -48,7 +51,8 @@ mdit-py-plugins==0.4.2
 mdurl==0.1.2
 murmurhash==1.0.10
 networkx==3.2.1
-numpy==2.0.2
+nltk==3.9.1
+numpy==1.26.4
 packaging==24.1
 pandas==2.2.3
 parso==0.8.4
@@ -71,8 +75,10 @@ python-dateutil==2.9.0.post0
 python-multipart==0.0.12
 pytz==2024.2
 questionary==2.0.1
+regex==2024.11.6
 requests==2.32.3
 rich==13.9.4
+scikit-learn==1.6.1
 scipy==1.13.1
 seaborn==0.13.2
 shellingham==1.5.4
@@ -87,6 +93,7 @@ spacy-loggers==1.0.5
 srsly==2.4.8
 stack-data==0.6.3
 starlette==0.39.2
+stemming==1.0.1
 tenacity==9.0.0
 thinc==8.3.2
 threadpoolctl==3.5.0
@@ -107,6 +114,7 @@ weasel==0.4.1
 webencodings==0.5.1
 websockets==13.1
 widgetsnbextension==4.0.13
+wordcloud==1.9.4
 wrapt==1.16.0
 zipp==3.20.2
 zopfli==0.2.3.post1
