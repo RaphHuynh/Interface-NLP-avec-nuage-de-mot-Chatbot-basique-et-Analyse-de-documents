@@ -13,7 +13,7 @@ app_ui = ui.page_fluid(
                 ui.p("Descripteur", class_="mt-2"),
                 ui.input_select(
                     "choix1", "", 
-                    choices={"1": "Binaire", "2": "Occurence", "3": "Probalite", "4":"Normalise","5":"tf_idf_bin","6":"tf_idf_occ","7":"tf_idf_norm","8":"tf_idf_new"}, 
+                    choices={"1": "Binaire", "2": "Occurence", "3": "Probalite", "4":"Normalise","5":"tf_idf_bin","6":"tf_idf_occ","7":"tf_idf_norm","8":"tf_idf_new", "9": "Word2Vec", "10": "FastText", "11": "Doc2Vec"}, 
                     selected="1"  
                 ),
                 ui.p("Distance", class_="mt-2"),

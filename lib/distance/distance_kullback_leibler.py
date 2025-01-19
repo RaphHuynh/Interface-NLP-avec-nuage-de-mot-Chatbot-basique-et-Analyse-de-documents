@@ -12,10 +12,8 @@ def distance_kullback_leibler(vecteur_1: List[float], vecteur_2: List[float]) ->
     Returns:
         float: la distance de Kullback-Leibler entre les deux vecteurs
     """
-    # Calcul de la somme des logarithmes des ratios
-    resultat = sum(a * math.log(a / b) for a, b in zip(vecteur_1, vecteur_2) if a != 0 and b != 0)
+    return sum(a * math.log(a / b) for a, b in zip(vecteur_1, vecteur_2) if a != 0 and b != 0)
 
-    return resultat
 
 def matrice_kullback_leibler(corpus: List[str]) -> List[List[float]]:
     """ Calcul de la matrice de distance de Kullback-Leibler entre les vecteurs de mots de chaque phrase du corpus

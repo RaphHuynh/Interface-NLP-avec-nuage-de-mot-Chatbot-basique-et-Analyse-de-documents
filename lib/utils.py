@@ -183,8 +183,14 @@ def get_backbofwords(corpus_sans_poc: List[str], liste_mots: List[str], choix1: 
         return tf_idf_occ(corpus_sans_poc, liste_mots, stemming)
     elif choix1 == "7":
         return tf_idf_norm(corpus_sans_poc, liste_mots, stemming)
-    else:
+    elif choix1 == "8":
         return tf_idf_new(corpus_sans_poc, liste_mots, stemming)
+    elif choix1 == "9":
+        return word2vec_matrix(corpus_sans_poc, liste_mots, stemming)
+    elif choix1 == "10":
+        return calculer_vecteurs_fasttext(corpus_sans_poc, liste_mots, stemming)
+    else:
+        return calculer_vecteurs_doc2vec(corpus_sans_poc, liste_mots, stemming)
 
 def get_distance_matrix(list_backbofwords: List[List[float]], distance: str) -> List[List[float]]:
     """ Fonction pour obtenir la matrice de distance selon le choix de l'utilisateur.

@@ -33,8 +33,14 @@ def matrice_similarite(corpus: List[str], list_mot: List[str], distance_func: st
         descripteur_func = tf_idf_norm
     elif descripteur_func == "7":
         descripteur_func = tf_idf_occ
-    else:
+    elif descripteur_func == "8":
         descripteur_func = tf_idf_new
+    elif descripteur_func == "9":
+        descripteur_func = word2vec_matrix
+    elif descripteur_func == "10":
+        descripteur_func = calculer_vecteurs_fasttext
+    elif descripteur_func == "11":
+        descripteur_func = calculer_vecteurs_doc2vec
         
     if distance_func == "Euclidienne":
         distance_func = distance_euclidienne
